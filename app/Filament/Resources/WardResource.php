@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\WardResource\Pages;
 use App\Filament\Resources\WardResource\RelationManagers;
-use App\Models\Ward;
+use App\Models\ward;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class WardResource extends Resource
 {
-    protected static ?string $model = Ward::class;
+    protected static ?string $model = ward::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 

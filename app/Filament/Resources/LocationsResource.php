@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\LocationsResource\Pages;
 use App\Filament\Resources\LocationsResource\RelationManagers;
-use App\Models\Locations;
+use App\Models\locations;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class LocationsResource extends Resource
 {
-    protected static ?string $model = Locations::class;
+    protected static ?string $model = locations::class;
 
     protected static ?string $navigationGroup = 'INFORMATIONS';
 

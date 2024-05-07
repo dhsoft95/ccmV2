@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\RegionsResource\Pages;
 use App\Filament\Resources\RegionsResource\RelationManagers;
-use App\Models\Regions;
+use App\Models\regions;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class RegionsResource extends Resource
 {
-    protected static ?string $model = Regions::class;
+    protected static ?string $model = regions::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-globe-europe-africa';
     protected static ?string $navigationGroup = 'INFORMATIONS';

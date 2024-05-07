@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\VillageResource\Pages;
 use App\Filament\Resources\VillageResource\RelationManagers;
-use App\Models\Village;
+use App\Models\village;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class VillageResource extends Resource
 {
-    protected static ?string $model = Village::class;
+    protected static ?string $model = village::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 

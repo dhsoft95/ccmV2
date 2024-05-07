@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\MessagesResource\Pages;
 use App\Filament\Resources\MessagesResource\RelationManagers;
-use App\Models\Messages;
+use App\Models\messages;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class MessagesResource extends Resource
 {
-    protected static ?string $model = Messages::class;
+    protected static ?string $model = messages::class;
     protected static ?string $navigationGroup = 'OPERATIONS';
 
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-ellipsis';

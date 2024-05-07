@@ -6,7 +6,7 @@ use App\Filament\Resources\SupportersResource\Pages;
 use App\Filament\Resources\SupportersResource\RelationManagers;
 use App\Models\candidates;
 use App\Models\regions;
-use App\Models\Supporters;
+use App\Models\supporters;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class SupportersResource extends Resource
 {
-    protected static ?string $model = Supporters::class;
+    protected static ?string $model = supporters::class;
 
     protected static ?string $navigationGroup = 'PEOPLE';
 
