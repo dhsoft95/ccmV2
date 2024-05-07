@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CandidatesResource\Pages;
 use App\Filament\Resources\CandidatesResource\RelationManagers;
-use App\Models\Candidates;
+use App\Models\candidates;
 use App\Models\districts;
 use App\Models\User;
 use App\Models\village;
