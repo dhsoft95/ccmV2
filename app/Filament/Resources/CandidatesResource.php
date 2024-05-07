@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Hash;
 
 class CandidatesResource extends Resource
 {
-    protected static ?string $model = Candidates::class;
+    protected static ?string $model = candidates::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
