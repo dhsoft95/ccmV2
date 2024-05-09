@@ -53,7 +53,7 @@ class SmSController extends Controller
                     ],
                     'json' => [
                         'recipient' => $phoneNumber,
-                        'sender_id' => 'HARUS YANGU',
+                        'sender_id' => 'Info',
                         'message' => $message,
                     ],
                 ]);
