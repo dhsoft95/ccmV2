@@ -5,9 +5,10 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\SupportersResource\Pages;
 use App\Filament\Resources\SupportersResource\RelationManagers;
 use App\Models\candidates;
-use App\Models\regions;
-use App\Models\supporters;
-use App\Models\User;
+use App\Models\districts;
+use App\Models\Supporters;
+use App\Models\village;
+use App\Models\ward;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
@@ -19,7 +20,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class SupportersResource extends Resource
 {
-    protected static ?string $model = supporters::class;
+    protected static ?string $model = Supporters::class;
 
     protected static ?string $navigationGroup = 'PEOPLE';
 
@@ -30,19 +31,35 @@ class SupportersResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('user_id')
-                    ->label('Region')
-                    ->options(User::all()->pluck('name', 'id'))
-                    ->searchable()->label('Created By'),
-                Forms\Components\TextInput::make('full_name')
+                Forms\Components\TextInput::make('first_name')
                     ->maxLength(255)
-                    ->default(null)->required(),
-                Forms\Components\DatePicker::make('dob')->label('Date of birth'),
+                    ->default(null),
+                Forms\Components\TextInput::make('last_name')
+                    ->maxLength(255)
+                    ->default(null),
+                Forms\Components\DatePicker::make('dob'),
                 Select::make('gander')
                     ->options([
                         'male' => 'Male',
                         'female' => 'Female',
                     ])->required(),
+                Forms\Components\Select::make('region_id')
+                    ->relationship('region', 'name')
+                    ->required(),
+                Select::make('district_id')
+                    ->label('District')
+                    ->options(districts::all()->pluck('name', 'id'))
+                    ->searchable(),
+
+                Select::make('village_id')
+                    ->label('Village')
+                    ->options(village::all()->pluck('name', 'id'))
+                    ->searchable(),
+
+                Select::make('ward_id')
+                    ->label('Ward')
+                    ->options(ward::all()->pluck('name', 'id'))
+                    ->searchable(),
                 Select::make('candidate_id')
                     ->label('Candidate')
                     ->options(candidates::all()->pluck('full_name', 'id'))
@@ -62,16 +79,27 @@ class SupportersResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user.name')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('full_name')
+                Tables\Columns\TextColumn::make('first_name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('last_name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('dob')
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('gander')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('region.name')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('village.name')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('ward.name')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('district.name')
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('candidate.full_name')
                     ->numeric()
                     ->sortable(),

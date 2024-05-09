@@ -18,8 +18,6 @@ class ManageRegions extends ManageRecords
     {
         return [
             Actions\CreateAction::make(),
-            ImportAction::make()
-                ->importer(RegionsImporter::class)
         ];
     }
 }

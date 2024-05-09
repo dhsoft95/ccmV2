@@ -31,5 +31,4 @@ class ward extends Model
     {
         return $this->belongsTo(village::class);
     }
-
 }

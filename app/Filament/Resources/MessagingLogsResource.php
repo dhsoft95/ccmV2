@@ -19,7 +19,9 @@ class MessagingLogsResource extends Resource
 {
     protected static ?string $model = messaging_logs::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-cog';
+
+    protected static ?string $navigationGroup = 'SETTINGS';
 
     public static function form(Form $form): Form
     {

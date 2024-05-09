@@ -14,7 +14,7 @@ class regions extends Model
      * @var array
      */
     protected $fillable = ['name', 'other_region_details'];
-    use HasFactory;
+
     public function candidates()
     {
         return $this->hasMany(candidates::class);
@@ -22,7 +22,7 @@ class regions extends Model
 
     public function districts()
     {
-        return $this->hasMany(districts::class);
+        return $this->hasMany(districts::class, 'region_id');
     }
 
     public function location()
@@ -32,11 +32,11 @@ class regions extends Model
 
     public function villages()
     {
-        return $this->hasMany(Village::class);
+        return $this->hasMany(village::class);
     }
 
     public function wards()
     {
-        return $this->hasManyThrough(Ward::class, districts::class);
+        return $this->hasManyThrough(ward::class, districts::class);
     }
 }

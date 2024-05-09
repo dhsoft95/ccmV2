@@ -23,7 +23,11 @@ class CandidatesResource extends Resource
 {
     protected static ?string $model = candidates::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-bookmark-square';
+
+
+    protected static ?string $navigationGroup = 'PEOPLE';
+
 
     public static function form(Form $form): Form
     {
@@ -77,9 +81,9 @@ class CandidatesResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user.name')
-                    ->numeric()
-                    ->sortable(),
+//                Tables\Columns\TextColumn::make('user.name')
+//                    ->numeric()
+//                    ->sortable(),
                 Tables\Columns\TextColumn::make('full_name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('phone')
@@ -94,13 +98,13 @@ class CandidatesResource extends Resource
                 Tables\Columns\TextColumn::make('region.name')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('village_id')
+                Tables\Columns\TextColumn::make('village.name')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('ward_id')
+                Tables\Columns\TextColumn::make('ward.name')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('district_id')
+                Tables\Columns\TextColumn::make('district.name')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('email_verified_at')

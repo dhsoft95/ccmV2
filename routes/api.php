@@ -1,23 +1,29 @@
 <?php
-
 use App\Http\Controllers\Api\AuthenticationController;
-use App\Http\Controllers\Api\CandidateController;
+use App\Http\Controllers\Api\CandidateController; // Assuming you have one
+use App\Http\Controllers\Api\DropdownMenuController;
 use App\Http\Controllers\Api\MessageController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\SmSController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:api');
+// Route to get dropdown data
+Route::get('/dropdown-data', [DropdownMenuController::class, 'getDropdownData']);
 
-Route::post('/messages', [MessageController::class, 'sendMessageToSupporters'])->name('messages');
+// Middleware group for authenticated routes
+Route::middleware('auth:api')->group(function () {
+    // Route to logout
+    Route::post('/logout', [AuthenticationController::class, 'logout']);
 
-Route::post('/candidates', [CandidateController::class, 'store']);
+    // Route to send SMS invitations (restricted to authenticated candidates)
 
-Route::post('/register',[AuthenticationController::class,'register']);
-Route::post('/login',[AuthenticationController::class,'login']);
-Route::middleware('auth:api')->group(function(){
-    Route::post('/logout',[AuthenticationController::class,'logout']);
+    Route::middleware('auth:api')->post('/send-sms-invitation', [SmSController::class, 'sendSMSInvitation']);
 
 
+    // Route to send messages (authenticated users only)
+    Route::post('/messages', [MessageController::class, 'sendMessageToSupporters'])
+        ->name('messages');
 });
+
+// Route to register and login (outside the middleware group)
+Route::post('/register', [AuthenticationController::class, 'register']);
+Route::post('/login', [AuthenticationController::class, 'login']);

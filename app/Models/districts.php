@@ -7,18 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 
 class districts extends Model
 {
+    use HasFactory;
 
     protected $fillable = ['region_id', 'name', 'other_district_details'];
-    use HasFactory;
 
     public function region()
     {
-        return $this->belongsTo(regions::class);
+        return $this->belongsTo(regions::class, 'region_id');
     }
+
     public function candidates()
     {
-        return $this->hasMany(candidates::class);
+        return $this->belongsTo(candidates::class);
     }
+
     public function location()
     {
         return $this->belongsTo(locations::class);
@@ -26,13 +28,15 @@ class districts extends Model
 
     public function villages()
     {
-        return $this->hasMany(Village::class);
+        return $this->hasMany(village::class);
     }
 
     public function wards()
     {
-        return $this->hasMany(ward::class);
+        return $this->hasMany(ward::class, 'district_id'); // Correcting the foreign key name
     }
-
-
+    public function supporters()
+    {
+        return $this->hasMany(supporters::class);
+    }
 }

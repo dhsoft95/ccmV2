@@ -42,6 +42,14 @@ class candidates extends Model
     {
         return $this->belongsTo(regions::class);
     }
+    public function village(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(village::class);
+    }
+    public function ward(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(ward::class);
+    }
 
     public function district()
     {
@@ -56,4 +64,5 @@ class candidates extends Model
     {
         return $this->hasMany(supporters::class);
     }
+
 }

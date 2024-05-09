@@ -13,10 +13,14 @@ return new class extends Migration
     {
         Schema::create('supporters', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('full_name')->nullable();
+            $table->string('first_name')->nullable();
+            $table->string('last_name')->nullable();
             $table->date('dob')->nullable();
             $table->string('gander')->nullable();
+            $table->unsignedBigInteger('region_id');
+            $table->unsignedBigInteger('village_id');
+            $table->unsignedBigInteger('ward_id');
+            $table->unsignedBigInteger('district_id');
             $table->unsignedBigInteger('candidate_id');
             $table->string('phone_number')->nullable();
             $table->boolean('promised')->default(false);

@@ -17,8 +17,6 @@ class ManageDistricts extends ManageRecords
     {
         return [
             Actions\CreateAction::make(),
-               ImportAction::make()
-                   ->importer(DistrictsImporter::class)
         ];
     }
 }
