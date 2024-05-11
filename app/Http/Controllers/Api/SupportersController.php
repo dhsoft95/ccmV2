@@ -34,7 +34,7 @@ class SupportersController extends Controller
         $validatedData['candidate_id'] = Auth::id();
 
         // Create a new instance of Supporters with the validated data
-        $newData = Supporters::create($validatedData);
+        $newData = supporters::create($validatedData);
 
         // Return a response indicating success or failure
         if ($newData) {
