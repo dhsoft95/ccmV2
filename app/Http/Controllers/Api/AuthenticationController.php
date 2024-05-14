@@ -127,7 +127,8 @@ class AuthenticationController extends Controller
             // OTP sent successfully
             return response()->json([
                 'message' => 'OTP sent successfully.',
-                'otp_identifier' => uniqid()
+                'otp_identifier' => uniqid(),
+                ' otp' => $otp
             ]);
         } catch (\Exception $e) {
             // Log the error for debugging purposes
