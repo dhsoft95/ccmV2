@@ -25,6 +25,9 @@ Route::middleware('auth:api')->group(function () {
         ->name('messages');
 });
 
+
 // Route to register and login (outside the middleware group)
 Route::post('/register', [AuthenticationController::class, 'register']);
 Route::post('/login', [AuthenticationController::class, 'login']);
+Route::post('/sendOtp', [AuthenticationController::class, 'sendOtp']);
+//Route::post('/verifyOtp', [AuthenticationController::class, 'verifyOtp']);
