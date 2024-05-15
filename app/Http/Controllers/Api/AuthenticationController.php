@@ -33,7 +33,7 @@ class AuthenticationController extends Controller
         }
 
         $user = candidates::create([
-            'full_name' => $validatedData['full_name'], // Correct key
+            'full_name' => $validatedData['full_name'],
             'email' => $validatedData['email'],
             'password' => Hash::make($validatedData['password']),
             'phone' => $validatedData['phone'],
@@ -88,7 +88,6 @@ class AuthenticationController extends Controller
 
     public function logout(Request $request): \Illuminate\Foundation\Application|\Illuminate\Http\Response|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory
     {
-
         $request->user()->token()->revoke();
         return response([
             'message'=>'Logged out sucesfully'
