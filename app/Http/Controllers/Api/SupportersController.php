@@ -11,6 +11,11 @@ class SupportersController extends Controller
 {
     public function store(Request $request)
     {
+        // Check if the user is authenticated
+        if (!Auth::check()) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
         // Validate incoming request data
         $validatedData = $request->validate([
             'first_name' => 'required|string',
@@ -28,10 +33,11 @@ class SupportersController extends Controller
             'phone_number.unique' => 'The phone number has already been taken.'
         ]);
 
-
-
         // Set candidate_id based on the authenticated user's ID
         $validatedData['candidate_id'] = Auth::id();
+
+        // Log the candidate_id for debugging
+        Log::info('Authenticated user ID: ' . Auth::id());
 
         // Create a new instance of Supporters with the validated data
         $newData = supporters::create($validatedData);
@@ -47,5 +53,6 @@ class SupportersController extends Controller
             return response()->json(['message' => 'Failed to insert data'], 500);
         }
     }
+
 
 }

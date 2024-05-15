@@ -55,6 +55,8 @@ class AuthenticationController extends Controller
                 'user' => [
                     'full_name' => $user->full_name,
                     'email' => $user->email,
+                    'position_id' => $user->position_id,
+                    'phone' => $user->phone,
                 ],
                 'token' => $token
             ]
@@ -87,6 +89,8 @@ class AuthenticationController extends Controller
                 'user' => [
                     'full_name' => $candidate->full_name,
                     'email' => $candidate->email,
+                    'position_id' => $candidate->position_id,
+                    'phone' => $candidate->phone,
                 ],
                 'token' => $token
             ]

@@ -18,7 +18,7 @@ Route::middleware('auth:api')->group(function () {
     // Route to send SMS invitations (restricted to authenticated candidates)
 
     Route::middleware('auth:api')->post('/send-sms-invitation', [SmSController::class, 'sendSMSInvitation']);
-    Route::middleware('auth:api')->post('/create', [\App\Http\Controllers\Api\SupportersController::class, 'store']);
+    Route::middleware('auth:api')->post('/supporters', [\App\Http\Controllers\Api\SupportersController::class, 'store']);
 
 
     // Route to send messages (authenticated users only)
