@@ -33,7 +33,7 @@ class AuthenticationController extends Controller
         }
 
         $user = candidates::create([
-            'full_name' => $validatedData['username'],
+            'full_name' => $validatedData['full_name'], // Correct key
             'email' => $validatedData['email'],
             'password' => Hash::make($validatedData['password']),
             'phone' => $validatedData['phone'],
@@ -53,6 +53,7 @@ class AuthenticationController extends Controller
             'token' => $token
         ], 201);
     }
+
 
     public function login(Request $request)
     {
