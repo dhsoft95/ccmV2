@@ -20,7 +20,7 @@ class SupportersController extends Controller
         $validatedData = $request->validate([
             'first_name' => 'required|string',
             'last_name' => 'required|string',
-            'dob' => 'required|date',
+            'dob' => '|date',
             'gender' => 'required|string',
             'region_id' => 'required|integer',
             'village_id' => 'required|integer',
