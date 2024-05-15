@@ -16,7 +16,7 @@ class SmSController extends Controller
     public static function sendSMSInvitation(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'message' => 'required|string|max:160', // Adjust character limit as needed
+            'sms_content' => 'required|string|max:160', // Adjust character limit as needed
         ]);
 
         if ($validator->fails()) {
@@ -26,17 +26,14 @@ class SmSController extends Controller
         $client = new GuzzleClient();
 
         try {
-            $candidate = Auth::user();
-            $message = $request->input('message');
+            $candidateId = Auth::id(); // Get candidate ID
 
-            // Retrieve the ID of the authenticated user
-            $candidateId = Auth::id();
+            $smsContent = $request->input('sms_content');
 
             // Retrieve phone numbers of supporters associated with the candidate
             $supporterPhoneNumbers = supporters::where('candidate_id', $candidateId)
                 ->pluck('phone_number');
 
-            // Check if there are supporters associated with the candidate
             if ($supporterPhoneNumbers->isEmpty()) {
                 return response()->json([
                     'error' => true,
@@ -54,24 +51,24 @@ class SmSController extends Controller
                     'json' => [
                         'recipient' => $phoneNumber,
                         'sender_id' => 'HARUS YANGU',
-                        'message' => $message,
+                        'message' => $smsContent,
                     ],
                 ]);
 
                 $responseData = json_decode($response->getBody()->getContents(), true);
 
                 $status = $responseData['status'] ?? 'error';
-                $message = $responseData['message'] ?? 'Unknown error';
+                $responseMessage = $responseData['message'] ?? 'Unknown error';
 
                 $responseArray[] = [
                     'recipient' => $phoneNumber,
                     'status' => $status,
-                    'message' => $message,
+                    'message' => $responseMessage,
                 ];
 
                 // Queue failed message notification (optional)
                 if ($status !== 'success') {
-                    Queue::push(new SmsSendingFailed($phoneNumber, $message));
+                    Queue::push(new SmsSendingFailed($phoneNumber, $responseMessage));
                 }
 
                 // Implement bulk sending logic if supported by your SMS API
@@ -86,4 +83,7 @@ class SmSController extends Controller
             ], 500);
         }
     }
+
+
+
 }
