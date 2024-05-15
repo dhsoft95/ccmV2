@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\supporters;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class SupportersController extends Controller
 {
