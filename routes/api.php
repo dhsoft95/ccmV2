@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 
 // Route to get dropdown data
 Route::get('/dropdown-data', [DropdownMenuController::class, 'getDropdownData']);
+Route::get('/positions-data', [DropdownMenuController::class, 'getPositionData']);
 
 // Middleware group for authenticated routes
 Route::middleware('auth:api')->group(function () {

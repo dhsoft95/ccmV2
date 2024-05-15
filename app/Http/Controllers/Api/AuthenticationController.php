@@ -49,9 +49,16 @@ class AuthenticationController extends Controller
         $token = $user->createToken('auth_token')->accessToken;
 
         return response()->json([
-            'message' => 'User registered successfully.',
-            'token' => $token
-        ], 201);
+            'status' => 'success',
+            'message' => 'Registered successfully.',
+            'data' => [
+                'user' => [
+                    'full_name' => $user->full_name,
+                    'email' => $user->email,
+                ],
+                'token' => $token
+            ]
+        ]);
     }
 
 
