@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\candidates;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
@@ -80,6 +81,10 @@ class AuthenticationController extends Controller
             ], 401);
         }
 
+        // Fetch position name from the database table
+        $positionName = DB::table('positions')->where('id', $candidate->position_id)->value('name');
+
+        // Generate access token
         $token = $candidate->createToken('auth_token')->accessToken;
 
         return response()->json([
@@ -89,13 +94,15 @@ class AuthenticationController extends Controller
                 'user' => [
                     'full_name' => $candidate->full_name,
                     'email' => $candidate->email,
-                    'position_id' => $candidate->position_id,
+//                    'position_id' => $candidate->position_id,
+                    'position_name' => $positionName, // Position name retrieved from the database table
                     'phone' => $candidate->phone,
                 ],
                 'token' => $token
             ]
         ]);
     }
+
 
     public function logout(Request $request): \Illuminate\Foundation\Application|\Illuminate\Http\Response|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory
     {
