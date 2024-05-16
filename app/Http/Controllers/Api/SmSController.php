@@ -13,76 +13,79 @@ use Illuminate\Support\Facades\Queue;
 
 class SmSController extends Controller
 {
-    public static function sendSMSInvitation(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'sms_content' => 'required|string|max:160', // Adjust character limit as needed
-        ]);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
 
-        $client = new GuzzleClient();
+public static function sendSMSInvitation(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'sms_content' => 'required|string|max:160', // Adjust character limit as needed
+    ]);
 
-        try {
-            $candidateId = Auth::id(); // Get candidate ID
+    if ($validator->fails()) {
+        return response()->json($validator->errors(), 422);
+    }
 
-            $smsContent = $request->input('sms_content');
+    $client = new GuzzleClient();
 
-            // Retrieve phone numbers of supporters associated with the candidate
-            $supporterPhoneNumbers = supporters::where('candidate_id', $candidateId)
-                ->pluck('phone_number');
+    try {
+        $candidateId = Auth::id(); // Get candidate ID
 
-            if ($supporterPhoneNumbers->isEmpty()) {
-                return response()->json([
-                    'error' => true,
-                    'message' => 'Failed to send SMS invitations: No supporters found',
-                ], 422);
-            }
+        $smsContent = $request->input('sms_content');
 
-            $responseArray = [];
-            foreach ($supporterPhoneNumbers as $phoneNumber) {
-                $response = $client->post(env('SMS_API_URL'), [
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . env('SMS_API_TOKEN'),
-                        'Accept' => 'application/json',
-                    ],
-                    'json' => [
-                        'recipient' => $phoneNumber,
-                        'sender_id' => 'HARUS YANGU',
-                        'message' => $smsContent,
-                    ],
-                ]);
+        // Retrieve phone numbers of supporters associated with the candidate
+        $supporterPhoneNumbers = supporters::where('candidate_id', $candidateId)
+            ->pluck('phone_number');
 
-                $responseData = json_decode($response->getBody()->getContents(), true);
-
-                $status = $responseData['status'] ?? 'error';
-                $responseMessage = $responseData['message'] ?? 'Unknown error';
-
-                $responseArray[] = [
-                    'recipient' => $phoneNumber,
-                    'status' => $status,
-                    'message' => $responseMessage,
-                ];
-
-                // Queue failed message notification (optional)
-                if ($status !== 'success') {
-                    Queue::push(new SmsSendingFailed($phoneNumber, $responseMessage));
-                }
-
-                // Implement bulk sending logic if supported by your SMS API
-            }
-
-            return response()->json($responseArray);
-        } catch (\Exception $e) {
-            Log::error('SMS sending failed: ' . $e->getMessage());
+        if ($supporterPhoneNumbers->isEmpty()) {
             return response()->json([
                 'error' => true,
-                'message' => 'Failed to send SMS invitations: ' . $e->getMessage(),
-            ], 500);
+                'message' => 'Failed to send SMS invitations: No supporters found',
+            ], 422);
         }
+
+        $responseArray = [];
+        foreach ($supporterPhoneNumbers as $phoneNumber) {
+            $response = $client->post(env('SMS_API_URL'), [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . env('SMS_API_TOKEN'),
+                    'Accept' => 'application/json',
+                ],
+                'json' => [
+                    'recipient' => $phoneNumber,
+                    'sender_id' => 'HARUS YANGU',
+                    'message' => $smsContent,
+                ],
+            ]);
+
+            $responseData = json_decode($response->getBody()->getContents(), true);
+
+            $status = $responseData['status'] ?? 'error';
+            $responseMessage = $responseData['message'] ?? 'Unknown error';
+
+            $responseArray[] = [
+                'recipient' => $phoneNumber,
+                'status' => $status,
+                'message' => $responseMessage,
+            ];
+
+            // Queue failed message notification (optional)
+            if ($status !== 'success') {
+                Queue::push(new SmsSendingFailed($phoneNumber, $responseMessage));
+            }
+
+            // Implement bulk sending logic if supported by your SMS API
+        }
+
+        return response()->json($responseArray);
+    } catch (\Exception $e) {
+        Log::error('SMS sending failed: ' . $e->getMessage());
+        return response()->json([
+            'error' => true,
+            'message' => 'Failed to send SMS invitations: ' . $e->getMessage(),
+        ], 500);
     }
+}
+
 
 
 

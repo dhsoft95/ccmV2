@@ -38,12 +38,12 @@ return [
     'guards' => [
         'web' => [
             'driver' => 'session',
-            'provider' => 'users',
+            'provider' => 'candidates',
         ],
 
         'api' => [
             'driver' => 'passport', // or 'token' for Laravel Sanctum
-            'provider' => 'users',
+            'provider' => 'candidates',
             'hash' => false,
         ],
     ],
@@ -67,9 +67,9 @@ return [
     */
 
     'providers' => [
-        'users' => [
+        'candidates' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
+            'model' => env('AUTH_MODEL', App\Models\candidates::class),
         ],
 
         // 'users' => [

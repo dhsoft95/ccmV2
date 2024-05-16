@@ -2,17 +2,21 @@
 
 namespace App\Models;
 
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 
-class candidates extends Model
+class candidates extends Authenticatable
 {
+    use HasFactory, Notifiable, HasApiTokens;
 
-    use HasFactory, Notifiable ,HasApiTokens;
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
-
         'full_name',
         'phone',
         'email',
@@ -23,11 +27,32 @@ class candidates extends Model
         'ward_id',
         'district_id',
         'password',
-        'other_candidate_details'
+        'other_candidate_details',
     ];
 
-    use HasFactory;
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
 
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
+
+    /**
+     * Relationships
+     */
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -35,34 +60,36 @@ class candidates extends Model
 
     public function position(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(positions::class);
+        return $this->belongsTo(Positions::class);
     }
 
     public function region(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(regions::class);
-    }
-    public function village(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(village::class);
-    }
-    public function ward(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(ward::class);
+        return $this->belongsTo(Regions::class);
     }
 
-    public function district()
+    public function village(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(districts::class);
+        return $this->belongsTo(Village::class);
+    }
+
+    public function ward(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Ward::class);
+    }
+
+    public function district(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Districts::class);
     }
 
     public function messages(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(messages::class);
-    }
-    public function supporters(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->hasMany(supporters::class);
+        return $this->hasMany(Messages::class);
     }
 
+    public function supporters(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Supporters::class);
+    }
 }

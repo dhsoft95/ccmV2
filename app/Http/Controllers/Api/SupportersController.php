@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\supporters;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class SupportersController extends Controller
@@ -54,6 +55,24 @@ class SupportersController extends Controller
             return response()->json(['message' => 'Failed to insert data'], 500);
         }
     }
+
+    public function index()
+    {
+        // Get the authenticated user's ID
+        $userId = Auth::id();
+        // Fetch all supporters where candidate_id is equal to the authenticated user's ID
+        $supporters = DB::table('supporters')->where('candidate_id', $userId)->get();
+
+        // Check if the collection is empty
+        if ($supporters->isEmpty()) {
+            // Return a custom message if no data is found
+            return response()->json(['message' => 'data not found'], 404);
+        }
+
+        // Return the data as a JSON response
+        return response()->json($supporters);
+    }
+
 
 
 }
