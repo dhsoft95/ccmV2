@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('candidates', function (Blueprint $table) {
             $table->id();
             $table->string('full_name');
+            $table->string('name');
             $table->string('phone');
             $table->string('email');
             $table->string('party_affiliation');

@@ -2,14 +2,30 @@
 
 namespace App\Models;
 
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasName;
+use Filament\Panel;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
-
 class candidates extends Authenticatable
 {
     use HasFactory, Notifiable, HasApiTokens;
+
+    public function getFilamentName(): string
+    {
+        return "{$this->first_name} {$this->last_name}";
+    }
+
+
+    public function getNameAttribute()
+
+    {
+
+        return $this->full_name;
+
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -18,6 +34,7 @@ class candidates extends Authenticatable
      */
     protected $fillable = [
         'full_name',
+        'name',
         'phone',
         'email',
         'party_affiliation',
@@ -60,17 +77,17 @@ class candidates extends Authenticatable
 
     public function position(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Positions::class);
+        return $this->belongsTo(positions::class);
     }
 
     public function region(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Regions::class);
+        return $this->belongsTo(regions::class);
     }
 
     public function village(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Village::class);
+        return $this->belongsTo(village::class);
     }
 
     public function ward(): \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -85,11 +102,12 @@ class candidates extends Authenticatable
 
     public function messages(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Messages::class);
+        return $this->hasMany(messages::class);
     }
 
     public function supporters(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Supporters::class);
     }
+
 }
