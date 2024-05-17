@@ -92,12 +92,12 @@ class candidates extends Authenticatable
 
     public function ward(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Ward::class);
+        return $this->belongsTo(ward::class);
     }
 
     public function district(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Districts::class);
+        return $this->belongsTo(districts::class);
     }
 
     public function messages(): \Illuminate\Database\Eloquent\Relations\HasMany
@@ -107,7 +107,7 @@ class candidates extends Authenticatable
 
     public function supporters(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Supporters::class);
+        return $this->hasMany(supporters::class);
     }
 
 }
