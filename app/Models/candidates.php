@@ -109,5 +109,10 @@ class candidates extends Authenticatable
     {
         return $this->hasMany(supporters::class);
     }
+    public function sms_logs(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(sms_logs::class);
+    }
+
 
 }
