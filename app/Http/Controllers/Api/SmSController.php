@@ -66,7 +66,7 @@ class SmSController extends Controller
                 $responseArray[] = [
                     'recipient' => $phoneNumber,
                     'status' => $statusValue, // Set status as 1 for true (success) and 0 for false (failure)
-                    'message' => $responseMessage,
+                    'message' => $smsContent,
                 ];
 
                 if ($status !== 'success') {
