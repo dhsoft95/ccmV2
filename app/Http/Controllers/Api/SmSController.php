@@ -78,7 +78,7 @@ class SmSController extends Controller
                     'candidate_id' => $candidateId,
                     'recipient' => $phoneNumber,
                     'status' => $statusValue,
-                    'message' => $responseMessage,
+                    'message' => $smsContent,
                 ]);
             }
 
