@@ -11,6 +11,7 @@ class SmsLogsController extends Controller
     public function countMessages()
     {
         $candidateId = Auth::id();
+        \Log::info('Authenticated User ID in countMessages: ' . $candidateId);
 
         $successfulCount = sms_logs::where('candidate_id', $candidateId)
             ->where('status', 1)
@@ -32,6 +33,7 @@ class SmsLogsController extends Controller
     public function recentTransactions()
     {
         $candidateId = Auth::id();
+        \Log::info('Authenticated User ID in recentTransactions: ' . $candidateId);
 
         $recentTransactions = sms_logs::where('candidate_id', $candidateId)
             ->orderBy('created_at', 'desc')

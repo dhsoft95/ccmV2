@@ -1,6 +1,7 @@
 <?php
+
 use App\Http\Controllers\Api\AuthenticationController;
-use App\Http\Controllers\Api\CandidateController; // Assuming you have one
+
 use App\Http\Controllers\Api\DropdownMenuController;
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\SmSController;
@@ -9,13 +10,14 @@ use App\Http\Controllers\SmsLogsController;
 use Illuminate\Support\Facades\Route;
 
 // Routes outside middleware group for registration, login, and OTP
-Route::post('/register', [AuthenticationController::class, 'register']); // Register a new user
-Route::post('/login', [AuthenticationController::class, 'login']); // Login user
-Route::post('/sendOtp', [AuthenticationController::class, 'sendOtp']); // Send OTP for authentication
+ Route::post('/register', [AuthenticationController::class, 'register']); // Register a new user
+ Route::post('/login', [AuthenticationController::class, 'login']); // Login user
+ Route::post('/sendOtp', [AuthenticationController::class, 'sendOtp']); // Send OTP for authentication
+
 
 // Middleware group for authenticated routes
 Route::middleware('auth:api')->group(function () {
-    // Route to logout
+    // Route to log out
     Route::post('/logout', [AuthenticationController::class, 'logout']); // Logout user
 
     // Routes for counting messages and fetching recent transactions
@@ -28,8 +30,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/all-supporters', [SupportersController::class, 'index']); // Get all supporters
 
     // Route to send messages (authenticated users only)
-    Route::post('/messages', [MessageController::class, 'sendMessageToSupporters']) // Send message to supporters
-    ->name('messages');
+    Route::post('/messages', [MessageController::class, 'sendMessageToSupporters'])->name('messages');
 });
 
 // Routes for fetching dropdown and positions data
