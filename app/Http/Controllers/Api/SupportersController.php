@@ -25,7 +25,7 @@ class SupportersController extends Controller
             'dob' => '|date',
             'gender' => 'required|string',
             'region_id' => 'required|integer',
-            'village_id' => 'required|integer',
+            'village_id' => 'required',
             'ward_id' => 'required|integer',
             'district_id' => 'required|integer',
             'phone_number' => 'required|string|unique:supporters',
