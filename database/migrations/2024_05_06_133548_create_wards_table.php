@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('region_id')->constrained()->onDelete('cascade');
             $table->foreignId('district_id')->constrained()->onDelete('cascade');
-            $table->foreignId('village_id')->constrained()->onDelete('cascade');
+            $table->foreignId('village_id')->default(1)->constrained()->onDelete('cascade'); // Set a default value
             $table->string('name');
             $table->text('other_villages_details')->nullable();
             $table->timestamps();

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cfaee765574a9002ea19f081d5b7b6c4",
+    "content-hash": "97ac5a613b0a2f44ccc767c2b6999526",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -6434,6 +6434,53 @@
                 }
             ],
             "time": "2024-02-26T18:08:49+00:00"
+        },
+        {
+            "name": "salimmbise/tanzania-regions",
+            "version": "v2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/devmpemba/TanzaniaRegions.git",
+                "reference": "c141ab098241a6a380ac4af4514e1d67bb8e3786"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/devmpemba/TanzaniaRegions/zipball/c141ab098241a6a380ac4af4514e1d67bb8e3786",
+                "reference": "c141ab098241a6a380ac4af4514e1d67bb8e3786",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "SalimMbise\\TanzaniaRegions\\TanzaniaRegionsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "SalimMbise\\TanzaniaRegions\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Salimu Mbise",
+                    "email": "salymdeveloper@gmail.com"
+                }
+            ],
+            "description": "A Laravel package to get Tanzanian regions and their districts",
+            "support": {
+                "issues": "https://github.com/devmpemba/TanzaniaRegions/issues",
+                "source": "https://github.com/devmpemba/TanzaniaRegions/tree/v2.0.0"
+            },
+            "time": "2024-06-07T06:41:30+00:00"
         },
         {
             "name": "spatie/color",

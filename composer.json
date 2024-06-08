@@ -11,7 +11,8 @@
         "laravel/framework": "^11.0",
         "laravel/passport": "^12.0",
         "laravel/tinker": "^2.9",
-        "rupadana/filament-api-service": "^3.2"
+        "rupadana/filament-api-service": "^3.2",
+        "salimmbise/tanzania-regions": "^2.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

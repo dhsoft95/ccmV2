@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\DropdownMenuController;
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\SmSController;
 use App\Http\Controllers\Api\SupportersController;
+use App\Http\Controllers\regigionsController;
 use App\Http\Controllers\SmsLogsController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Route;
  Route::post('/register', [AuthenticationController::class, 'register']); // Register a new user
  Route::post('/login', [AuthenticationController::class, 'login']); // Login user
  Route::post('/sendOtp', [AuthenticationController::class, 'sendOtp']); // Send OTP for authentication
+ Route::post('/regions-all', [regigionsController::class, 'regions']); // Send OTP for authentication
 
 
 // Middleware group for authenticated routes

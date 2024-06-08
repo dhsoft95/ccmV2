@@ -115,7 +115,6 @@ class AuthenticationController extends Controller
 
     public function sendOtp(Request $request): \Illuminate\Http\JsonResponse
     {
-
         // Validate input data
         $request->validate([
             'phone' => 'required|string'
@@ -134,7 +133,7 @@ class AuthenticationController extends Controller
                 ],
                 'json' => [
                     'recipient' => $request->phone,
-                    'sender_id' => 'HARUS YANGU',
+                    'sender_id' => 'name',
                     'message' => "Your OTP is: $otp",
                 ],
             ]);
