@@ -31,8 +31,12 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/supporters', [SupportersController::class, 'store']); // Store supporter data
     Route::get('/all-supporters', [SupportersController::class, 'index']); // Get all supporters
 
+    // Route for deleting a supporter (protected by auth middleware)
+    Route::middleware('auth:api')->delete('supporters/{id}', [SupportersController::class, 'destroy']);
+
     // Route to send messages (authenticated users only)
     Route::post('/messages', [MessageController::class, 'sendMessageToSupporters'])->name('messages');
+
 });
 
 // Routes for fetching dropdown and positions data

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\supporters;
+use App\Models\Supporters;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -22,7 +22,7 @@ class SupportersController extends Controller
         $validatedData = $request->validate([
             'first_name' => 'required|string',
             'last_name' => 'required|string',
-            'dob' => '|date',
+            'dob' => 'date',
             'gender' => 'required|string',
             'region_id' => 'required|integer',
             'village_id' => 'required',
@@ -42,7 +42,7 @@ class SupportersController extends Controller
         Log::info('Authenticated user ID: ' . Auth::id());
 
         // Create a new instance of Supporters with the validated data
-        $newData = supporters::create($validatedData);
+        $newData = Supporters::create($validatedData);
 
         // Return a response indicating success or failure
         if ($newData) {
@@ -73,6 +73,35 @@ class SupportersController extends Controller
         return response()->json($supporters);
     }
 
+    public function destroy($id)
+    {
+        // Check if the user is authenticated
+        if (!Auth::check()) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
 
+        // Find the supporter by ID
+        $supporter = Supporters::find($id);
 
+        // Check if the supporter exists
+        if (!$supporter) {
+            Log::error('Supporter not found: ID ' . $id);
+            return response()->json(['message' => 'Supporter not found.'], 404);
+        }
+
+        // Log the candidate_id of the supporter and the authenticated user's ID for debugging
+        Log::info('Authenticated user ID: ' . Auth::id() . ', Supporter candidate ID: ' . $supporter->candidate_id);
+
+        // Check if the supporter belongs to the authenticated user
+        if ($supporter->candidate_id !== Auth::id()) {
+            return response()->json(['message' => 'Unauthorized.'], 403);
+        }
+
+        // Attempt to delete the supporter
+        if ($supporter->delete()) {
+            return response()->json(['message' => 'Supporter deleted successfully.'], 200);
+        } else {
+            return response()->json(['message' => 'Failed to delete supporter.'], 500);
+        }
+    }
 }
