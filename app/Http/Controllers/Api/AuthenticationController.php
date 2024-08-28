@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use GuzzleHttp\Client as GuzzleClient;
+
 class AuthenticationController extends Controller
 {
     public function register(Request $request)
@@ -34,7 +35,7 @@ class AuthenticationController extends Controller
             return response()->json(['errors' => $e->errors()], 422);
         }
 
-        $user = candidates::create([
+        $user = Candidates::create([
             'full_name' => $validatedData['full_name'],
             'email' => $validatedData['email'],
             'password' => Hash::make($validatedData['password']),
@@ -65,7 +66,6 @@ class AuthenticationController extends Controller
         ]);
     }
 
-
     public function login(Request $request)
     {
         $request->validate([
@@ -73,7 +73,7 @@ class AuthenticationController extends Controller
             'password' => 'required|string',
         ]);
 
-        $candidate = candidates::where('email', $request->input('email'))->first();
+        $candidate = Candidates::where('email', $request->input('email'))->first();
 
         if (!$candidate || !Hash::check($request->input('password'), $candidate->password)) {
             return response()->json([
@@ -95,7 +95,6 @@ class AuthenticationController extends Controller
                 'user' => [
                     'full_name' => $candidate->full_name,
                     'email' => $candidate->email,
-//                    'position_id' => $candidate->position_id,
                     'position_name' => $positionName, // Position name retrieved from the database table
                     'phone' => $candidate->phone,
                 ],
@@ -104,12 +103,11 @@ class AuthenticationController extends Controller
         ]);
     }
 
-
     public function logout(Request $request): \Illuminate\Foundation\Application|\Illuminate\Http\Response|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory
     {
         $request->user()->token()->revoke();
         return response([
-            'message'=>'Logged out sucesfully'
+            'message' => 'Logged out successfully'
         ]);
     }
 
@@ -146,7 +144,7 @@ class AuthenticationController extends Controller
             return response()->json([
                 'message' => 'OTP sent successfully.',
                 'otp_identifier' => uniqid(),
-                ' otp' => $otp
+                'otp' => $otp
             ]);
         } catch (\Exception $e) {
             // Log the error for debugging purposes
@@ -196,6 +194,72 @@ class AuthenticationController extends Controller
         }
     }
 
+    public function update(Request $request): \Illuminate\Http\JsonResponse
+    {
+        // Check if the user is authenticated
+        if (!Auth::check()) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
 
+        // Get the authenticated user's ID
+        $id = Auth::id();
+
+        // Validate incoming request data
+        $validatedData = $request->validate([
+            'full_name' => 'string',
+            'phone' => 'string|unique:candidates,phone,' . $id,
+            'email' => '|email|unique:candidates,email,' . $id,
+            'party_affiliation' => 'string',
+            'position_id' => 'exists:positions,id',
+            'region_id' => 'exists:regions,id',
+            'village_id' => 'exists:villages,id',
+            'ward_id' => 'exists:wards,id',
+            'district_id' => 'exists:districts,id',
+            'other_candidate_details' => 'nullable|string',
+            'password' => 'nullable|min:6'
+        ]);
+
+        // Find the candidate by ID
+        $candidate = Candidates::find($id);
+
+        // Check if the candidate exists
+        if (!$candidate) {
+            return response()->json(['message' => 'Candidate not found.'], 404);
+        }
+
+        // Update candidate data
+        $candidate->update([
+            'full_name' => $validatedData['full_name'] ?? $candidate->full_name,
+            'email' => $validatedData['email'] ?? $candidate->email,
+            'phone' => $validatedData['phone'] ?? $candidate->phone,
+            'party_affiliation' => $validatedData['party_affiliation'] ?? $candidate->party_affiliation,
+            'position_id' => $validatedData['position_id'] ?? $candidate->position_id,
+            'region_id' => $validatedData['region_id'] ?? $candidate->region_id,
+            'village_id' => $validatedData['village_id'] ?? $candidate->village_id,
+            'ward_id' => $validatedData['ward_id'] ?? $candidate->ward_id,
+            'district_id' => $validatedData['district_id'] ?? $candidate->district_id,
+            'other_candidate_details' => $validatedData['other_candidate_details'] ?? $candidate->other_candidate_details,
+            'password' => isset($validatedData['password']) ? Hash::make($validatedData['password']) : $candidate->password,
+        ]);
+
+        // Generate a new access token for the updated candidate
+        $token = $candidate->createToken('auth_token')->accessToken;
+
+        // Fetch position name from the database table
+        $positionName = DB::table('positions')->where('id', $candidate->position_id)->value('name');
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Candidate updated successfully.',
+            'data' => [
+                'user' => [
+                    'full_name' => $candidate->full_name,
+                    'email' => $candidate->email,
+                    'phone' => $candidate->phone,
+                    'position_name' => $positionName,
+                ],
+            ]
+        ]);
+    }
 
 }

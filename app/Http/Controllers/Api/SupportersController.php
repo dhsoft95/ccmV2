@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 
 class SupportersController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request): \Illuminate\Http\JsonResponse
     {
         // Check if the user is authenticated
         if (!Auth::check()) {
@@ -73,7 +73,7 @@ class SupportersController extends Controller
         return response()->json($supporters);
     }
 
-    public function destroy($id)
+    public function destroy($id): \Illuminate\Http\JsonResponse
     {
         // Check if the user is authenticated
         if (!Auth::check()) {
@@ -103,5 +103,47 @@ class SupportersController extends Controller
         } else {
             return response()->json(['message' => 'Failed to delete supporter.'], 500);
         }
+    }
+
+    public function update(Request $request, $id): \Illuminate\Http\JsonResponse
+    {
+        // Check if the user is authenticated
+        if (!Auth::check()) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
+        // Validate incoming request data
+        $validatedData = $request->validate([
+            'first_name' => 'required|string',
+            'last_name' => 'required|string',
+            'dob' => 'date',
+            'gender' => 'required|string',
+            'region_id' => 'required|integer',
+            'village_id' => 'required',
+            'ward_id' => 'required|integer',
+            'district_id' => 'required|integer',
+            'phone_number' => 'required|string|unique:supporters,phone_number,' . $id,
+            'promised' => 'nullable|string',
+            'other_supporter_details' => 'nullable|string',
+        ]);
+
+        // Find the supporter by ID
+        $supporter = Supporters::find($id);
+
+        // Check if the supporter exists
+        if (!$supporter) {
+            return response()->json(['message' => 'Supporter not found.'], 404);
+        }
+
+        // Check if the supporter belongs to the authenticated user
+        if ($supporter->candidate_id !== Auth::id()) {
+            return response()->json(['message' => 'Unauthorized.'], 403);
+        }
+
+        // Update the supporter with the validated data
+        $supporter->update($validatedData);
+
+        // Return a response indicating success
+        return response()->json(['message' => 'Supporter updated successfully.', 'data' => $supporter], 200);
     }
 }

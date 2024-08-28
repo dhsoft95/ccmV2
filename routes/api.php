@@ -33,6 +33,11 @@ Route::middleware('auth:api')->group(function () {
 
     // Route for deleting a supporter (protected by auth middleware)
     Route::middleware('auth:api')->delete('supporters/{id}', [SupportersController::class, 'destroy']);
+    // Route for updating candidate profile
+    Route::put('/candidate-update', [AuthenticationController::class, 'update'])->middleware('auth:api');
+
+
+
 
     // Route to send messages (authenticated users only)
     Route::post('/messages', [MessageController::class, 'sendMessageToSupporters'])->name('messages');

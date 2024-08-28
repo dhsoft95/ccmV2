@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\ValidationException;
 
-#[AllowDynamicProperties] class MessageController extends Controller
+ class MessageController extends Controller
 {
     public function __construct()
     {
