@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Otp extends Model
 {
-    protected $fillable = ['phone', 'otp', 'expires_at', 'is_used'];
+    protected $fillable = ['phone', 'otp', 'expires_at', 'is_used','reference_id'];
 
     protected $casts = [
         'expires_at' => 'datetime',
