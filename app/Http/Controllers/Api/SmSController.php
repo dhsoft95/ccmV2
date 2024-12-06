@@ -19,7 +19,7 @@ class SmSController extends Controller
     public function sendSMSInvitation(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'sms_content' => 'required|string|max:160', // Adjust character limit as needed
+            'sms_content' => 'required|string|max:160',
         ]);
 
         if ($validator->fails()) {
