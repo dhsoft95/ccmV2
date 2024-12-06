@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 // Routes outside middleware group for registration, login, and OTP
  Route::post('/register', [AuthenticationController::class, 'register']); // Register a new user
  Route::post('/login', [AuthenticationController::class, 'login']); // Login user
- Route::post('/sendOtp', [AuthenticationController::class, 'sendOtp']); // Send OTP for authentication
+ Route::post('/send-otp', [AuthenticationController::class, 'sendOtp']); // Send OTP for authentication
  Route::post('/regions-all', [regigionsController::class, 'regions']); // Send OTP for authentication
 
 
