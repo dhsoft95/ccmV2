@@ -115,46 +115,65 @@ class AuthenticationController extends Controller
     }
 
 
-    private function formatPhoneNumber($phone)
+    private function formatPhoneNumber($phone): array|string|null
     {
+        // Remove any non-digit characters
         $phone = preg_replace('/[^0-9]/', '', $phone);
 
-        if (substr($phone, 0, 1) === '0') {
-            $phone = '254' . substr($phone, 1);
+        // Check if number starts with 255
+        if (substr($phone, 0, 3) !== '255') {
+            throw new \Exception('Phone number must start with 255');
         }
 
-        if (substr($phone, 0, 3) !== '254') {
-            $phone = '254' . $phone;
+        // Validate length (must be 12 characters: 255XXXXXXXXX)
+        if (strlen($phone) !== 12) {
+            throw new \Exception('Invalid phone number length');
+        }
+
+        // Validate Tanzania prefixes
+        $validPrefixes = ['71', '74', '75', '76', '77', '78', '68', '69'];
+        $prefix = substr($phone, 3, 2);
+        if (!in_array($prefix, $validPrefixes)) {
+            throw new \Exception('Invalid Tanzania phone number prefix');
         }
 
         return $phone;
     }
 
-    public function sendOtp(Request $request): \Illuminate\Http\JsonResponse
+    public function sendOtp(Request $request)
     {
         $request->validate([
             'phone' => 'required|string'
         ]);
 
         try {
-            $formattedPhone = $this->formatPhoneNumber($request->phone);
+            try {
+                $formattedPhone = $this->formatPhoneNumber($request->phone);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'error' => true,
+                    'message' => 'Invalid phone number. Number must start with 255 followed by valid Tanzania prefix (e.g., 255712345678)'
+                ], 400);
+            }
+
+            // Generate OTP
             $otp = str_pad(mt_rand(0, 999999), 6, '0', STR_PAD_LEFT);
             $expiresAt = Carbon::now()->addMinutes(5);
-            $referenceId = Str::uuid()->toString();
 
+            // Log OTP generation
             Log::info('Generating OTP', [
                 'phone' => $formattedPhone,
-                'reference_id' => $referenceId,
                 'expires_at' => $expiresAt
             ]);
 
+            // Store OTP
             Otp::create([
-                'reference_id' => $referenceId,
                 'phone' => $formattedPhone,
                 'otp' => $otp,
                 'expires_at' => $expiresAt,
             ]);
 
+            // Send SMS
             $client = new GuzzleClient();
             $response = $client->post(env('SMS_API_URL'), [
                 'headers' => [
@@ -168,13 +187,8 @@ class AuthenticationController extends Controller
                 ],
             ]);
 
-            if ($response->getStatusCode() !== 200) {
-                throw new \Exception('SMS sending failed');
-            }
-
             return response()->json([
                 'message' => 'OTP sent successfully',
-                'reference_id' => $referenceId,
                 'expires_at' => $expiresAt
             ]);
 
@@ -220,7 +234,6 @@ class AuthenticationController extends Controller
             // Mark OTP as used
             $otpData->update(['is_used' => true]);
 
-            // Return success response with the phone number
             return response()->json([
                 'message' => 'OTP verified successfully',
                 'phone' => $otpData->phone,
