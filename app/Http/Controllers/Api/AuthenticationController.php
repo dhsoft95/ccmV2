@@ -131,7 +131,7 @@ class AuthenticationController extends Controller
                 ],
                 'json' => [
                     'recipient' => $request->phone,
-                    'sender_id' => 'AMCLINICTZ',
+                    'sender_id' => env('SMS_SENDER_ID'),  // Changed this line
                     'message' => "Your OTP is: $otp",
                 ],
             ]);

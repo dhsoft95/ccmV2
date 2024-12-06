@@ -54,7 +54,7 @@ class SendSMSJob implements ShouldQueue
                 ],
                 'json' => [
                     'recipient' => $this->phoneNumber,
-                    'sender_id' => 'HARUS YANGU',
+                    'sender_id' => env('SMS_SENDER_ID'),
                     'message' => $this->smsContent,
                 ],
             ]);
