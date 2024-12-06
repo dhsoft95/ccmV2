@@ -113,16 +113,19 @@ class AuthenticationController extends Controller
 
     public function sendOtp(Request $request): \Illuminate\Http\JsonResponse
     {
-        // Validate input data
-        $request->validate([
-            'phone' => 'required|string'
-        ]);
-
+        $request->validate(['phone' => 'required|string']);
         try {
-            // Generate a random OTP (One-Time Password)
             $otp = mt_rand(100000, 999999);
 
-            // Send the OTP via SMS
+            DB::table('otps')->updateOrInsert(
+                ['phone' => $request->phone],
+                [
+                    'otp' => Hash::make($otp),
+                    'expires_at' => now()->addMinutes(10),
+                    'created_at' => now()
+                ]
+            );
+
             $client = new GuzzleClient();
             $response = $client->post(env('SMS_API_URL'), [
                 'headers' => [
@@ -136,56 +139,39 @@ class AuthenticationController extends Controller
                 ],
             ]);
 
-            if ($response->getStatusCode() !== 200) {
-                throw new \Exception('Failed to send OTP via SMS.');
-            }
-
-            // OTP sent successfully
             return response()->json([
-                'message' => 'OTP sent successfully.',
-                'otp_identifier' => uniqid(),
-                'otp' => $otp
+                'status' => 'success',
+                'message' => 'OTP sent successfully'
             ]);
-        } catch (\Exception $e) {
-            // Log the error for debugging purposes
-            Log::error('OTP sending failed: ' . $e->getMessage());
 
-            return response()->json([
-                'error' => true,
-                'message' => 'Failed to send OTP via SMS. Please try again later.',
-            ], 500);
+        } catch (\Exception $e) {
+            Log::error('OTP sending failed: ' . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => 'Failed to send OTP'], 500);
         }
     }
 
     public function verifyOtp(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $request->validate([
-                'otp' => 'required|string|size:6',
-            ]);
+            $request->validate(['otp' => 'required|string|size:6']);
 
-            if ($request->otp !== session()->get('otp')) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Invalid OTP'
-                ], 401);
+            $storedOtp = DB::table('otps')
+                ->where('phone', $request->phone)
+                ->where('expires_at', '>', now())
+                ->first();
+
+            if (!$storedOtp || !Hash::check($request->otp, $storedOtp->otp)) {
+                return response()->json(['status' => 'error', 'message' => 'Invalid OTP'], 401);
             }
 
-            session()->forget('otp');
+            DB::table('otps')->where('phone', $request->phone)->delete();
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'OTP verified successfully'
-            ]);
+            return response()->json(['status' => 'success', 'message' => 'OTP verified']);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Verification failed'
-            ], 500);
+            return response()->json(['status' => 'error', 'message' => 'Verification failed'], 500);
         }
     }
-
     public function update(Request $request): \Illuminate\Http\JsonResponse
     {
         // Check if the user is authenticated
