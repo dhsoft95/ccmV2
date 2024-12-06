@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Jobs\SendSMSJob;
 use App\Models\sms_logs;
-use App\Models\supporters;
+use App\Models\Supporters;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -32,7 +32,7 @@ class SmSController extends Controller
             $smsContent = $request->input('sms_content');
 
             // Retrieve phone numbers of supporters associated with the candidate
-            $supporterPhoneNumbers = supporters::where('candidate_id', $candidateId)
+            $supporterPhoneNumbers = Supporters::where('candidate_id', $candidateId)
                 ->pluck('phone_number');
 
             if ($supporterPhoneNumbers->isEmpty()) {

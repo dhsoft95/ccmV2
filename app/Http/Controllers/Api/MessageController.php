@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use AllowDynamicProperties;
 use App\Http\Controllers\Controller;
 use App\Models\messaging_logs;
-use App\Models\supporters;
+use App\Models\Supporters;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -33,7 +33,7 @@ use Illuminate\Validation\ValidationException;
             $message = $request->input('message');
 
             // Retrieve all supporters associated with the candidate who have promised to support
-            $supporters = supporters::where('candidate_id', $candidateId)
+            $supporters = Supporters::where('candidate_id', $candidateId)
                 ->where('promised', 1)
                 ->get();
 

@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\sms_logs;
-use App\Models\supporters;
+use App\Models\Supporters;
 use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

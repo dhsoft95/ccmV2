@@ -23,6 +23,6 @@ class messaging_logs extends Model
      */
     public function supporter()
     {
-        return $this->belongsTo(supporters::class);
+        return $this->belongsTo(Supporters::class);
     }
 }

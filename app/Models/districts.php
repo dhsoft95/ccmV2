@@ -37,6 +37,6 @@ class districts extends Model
     }
     public function supporters()
     {
-        return $this->hasMany(supporters::class);
+        return $this->hasMany(Supporters::class);
     }
 }
