@@ -28,7 +28,7 @@ class AuthenticationController extends Controller
                 'party_affiliation' => 'required|string',
                 'position_id' => 'required|exists:positions,id',
                 'region_id' => 'required|exists:regions,id',
-                'village_id' => 'required|exists:villages,id',
+                'village_id' => 'required',
                 'ward_id' => 'required|exists:wards,id',
                 'district_id' => 'required|exists:districts,id',
                 'other_candidate_details' => 'nullable|string',
