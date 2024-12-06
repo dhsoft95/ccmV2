@@ -131,7 +131,7 @@ class AuthenticationController extends Controller
                 ],
                 'json' => [
                     'recipient' => $request->phone,
-                    'sender_id' => env('SMS_SENDER_ID'),  // Changed this line
+                    'sender_id' => env('SMS_SENDER_ID'),
                     'message' => "Your OTP is: $otp",
                 ],
             ]);
@@ -157,39 +157,32 @@ class AuthenticationController extends Controller
         }
     }
 
-    public function verifyOtp(Request $request)
+    public function verifyOtp(Request $request): \Illuminate\Http\JsonResponse
     {
-        $request->validate([
-            'otp' => 'required|string', // Validate OTP provided by the user
-        ]);
+        try {
+            $request->validate([
+                'otp' => 'required|string|size:6',
+            ]);
 
+            if ($request->otp !== session()->get('otp')) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Invalid OTP'
+                ], 401);
+            }
 
-        $storedOtp = session()->get('otp');
-
-        if ($storedOtp === null) {
-            // No OTP stored in session, meaning it has expired or hasn't been generated yet
-            return response()->json([
-                'error' => true,
-                'message' => 'OTP expired or not generated. Please request a new OTP.'
-            ], 400); // Bad Request status code
-        }
-
-        // Compare the OTP provided by the user with the stored OTP
-        if ($request->otp === $storedOtp) {
-            // OTP is correct, perform authentication or desired action
-
-            // Clear the stored OTP from session to prevent reuse
             session()->forget('otp');
 
             return response()->json([
-                'message' => 'OTP verification successful. User authenticated.'
+                'status' => 'success',
+                'message' => 'OTP verified successfully'
             ]);
-        } else {
-            // OTP is incorrect, display an error message
+
+        } catch (\Exception $e) {
             return response()->json([
-                'error' => true,
-                'message' => 'Incorrect OTP. Please try again.'
-            ], 401); // Unauthorized status code
+                'status' => 'error',
+                'message' => 'Verification failed'
+            ], 500);
         }
     }
 
