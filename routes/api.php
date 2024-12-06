@@ -44,6 +44,7 @@ Route::middleware('auth:api')->group(function () {
 
 });
 
+Route::post('/verify-otp', [AuthenticationController::class, 'verifyOtp']);
 // Routes for fetching dropdown and positions data
 Route::get('/dropdown-data', [DropdownMenuController::class, 'getDropdownData']); // Get dropdown data
 Route::get('/positions-data', [DropdownMenuController::class, 'getPositionData']); // Get positions data

@@ -163,8 +163,7 @@ class AuthenticationController extends Controller
             'otp' => 'required|string', // Validate OTP provided by the user
         ]);
 
-        // Retrieve the OTP sent earlier (stored securely on the server side)
-        // Here, we're assuming you have stored it in the session for simplicity
+
         $storedOtp = session()->get('otp');
 
         if ($storedOtp === null) {
