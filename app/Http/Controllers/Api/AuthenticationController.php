@@ -98,7 +98,7 @@ class AuthenticationController extends Controller
                 'user' => [
                     'full_name' => $candidate->full_name,
                     'email' => $candidate->email,
-                    'position_name' => $positionName, // Position name retrieved from the database table
+                    'position_name' => $positionName,
                     'phone' => $candidate->phone,
                 ],
                 'token' => $token
@@ -140,7 +140,7 @@ class AuthenticationController extends Controller
         return $phone;
     }
 
-    public function sendOtp(Request $request)
+    public function sendOtp(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
             'phone' => 'required|string'
@@ -205,7 +205,7 @@ class AuthenticationController extends Controller
         }
     }
 
-    public function verifyOtp(Request $request)
+    public function verifyOtp(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
             'otp' => 'required|string'

@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Queue;
 class SmSController extends Controller
 {
 
-    public function sendSMSInvitation(Request $request)
+    public function sendSMSInvitation(Request $request): \Illuminate\Http\JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'sms_content' => 'required|string|max:160',

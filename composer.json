@@ -5,7 +5,7 @@
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
         "eightynine/filament-excel-import": "^3.0",
         "filament/filament": "^3.2",
         "laravel/framework": "^11.0",

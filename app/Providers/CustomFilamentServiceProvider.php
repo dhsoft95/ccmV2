@@ -19,17 +19,18 @@ class CustomFilamentServiceProvider extends ServiceProvider
     /**
      * Bootstrap services.
      */
-    public function boot()
-    {
-        $this->app->extend(FilamentManager::class, function ($manager) {
-            $manager->macro('getUserName', function ($user) {
-                if ($user instanceof HasName) {
-                    return $user->getFilamentName();
-                }
-                return $user->getAttributeValue('full_name');
-            });
-
-            return $manager;
-        });
-    }
+//    public function boot()
+//    {
+//        $this->app->extend(FilamentManager::class, function ($manager) {
+//            $manager->macro('getUserName', function ($user) {
+//                if ($user instanceof HasName) {
+//                    return $user->getFilamentName();
+//                }
+//                return $user->getAttributeValue('full_name');
+//            });
+//
+//            return $manager;
+//        });
+//    }
+//}
 }
