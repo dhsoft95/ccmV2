@@ -19,8 +19,6 @@ class TanzaniaSeeder extends Seeder
         $this->seedSampleWards();
     }
 
-
-
     /**
      * Seed the default village with ID=1
      * This is necessary because wards table references village with ID=1 as default
@@ -46,7 +44,7 @@ class TanzaniaSeeder extends Seeder
             ]);
 
             // Create the default village with ID=1
-            \App\Models\Village::create([
+            \App\Models\village::create([
                 'id' => 1,
                 'name' => 'Default Village',
                 'region_id' => $defaultRegion->id,
