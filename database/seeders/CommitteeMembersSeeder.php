@@ -66,7 +66,7 @@ class CommitteeMembersSeeder extends Seeder
             'district_id' => $district->id,
             'village_id' => $defaultVillage->id,
             'ward_id' => $defaultWard->id,
-            'password' => Hash::make('password123'), // Default password
+            'password' => Hash::make('password123'),
         ]);
 
         // Committee data organized by wards and branches

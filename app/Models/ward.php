@@ -14,14 +14,14 @@ class ward extends Model
         'region_id',
         'district_id',
         'village_id',
-        'other_ward_details'
+        'other_villages_details'
+
     ];
 
     public function region()
     {
         return $this->belongsTo(regions::class);
     }
-
     public function district()
     {
         return $this->belongsTo(districts::class);
