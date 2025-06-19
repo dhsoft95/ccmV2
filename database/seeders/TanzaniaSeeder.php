@@ -4,8 +4,8 @@ namespace Database\Seeders;
 use App\Models\districts;
 use App\Models\regions;
 use App\Models\village;
+use App\Models\ward;
 use Illuminate\Database\Seeder;
-use App\Models\Ward;
 class TanzaniaSeeder extends Seeder
 {
     /**
@@ -271,7 +271,7 @@ class TanzaniaSeeder extends Seeder
                 foreach ($wards as $wardName) {
                     echo "  - Creating ward: {$wardName}\n";
 
-                    Ward::create([
+                    ward::create([
                         'name' => $wardName,
                         'region_id' => $district->region_id,
                         'district_id' => $district->id,
@@ -282,6 +282,6 @@ class TanzaniaSeeder extends Seeder
             }
         }
 
-        echo "Successfully seeded " . Ward::count() . " wards.\n";
+        echo "Successfully seeded " . ward::count() . " wards.\n";
     }
 }
