@@ -29,7 +29,7 @@ class TanzaniaSeeder extends Seeder
     private function seedDefaultVillage(): void
     {
 
-        if (!\App\Models\Village::find(1)) {
+        if (!village::find(1)) {
             echo "Creating default village...\n";
 
             // First create a default region if it doesn't exist
@@ -197,7 +197,7 @@ class TanzaniaSeeder extends Seeder
                 echo "Creating sample village for {$districtName}\n";
 
                 // Create a default village for this district
-                \App\Models\Village::create([
+             village::create([
                     'name' => "{$districtName} Central Village",
                     'region_id' => $district->region_id,
                     'district_id' => $district->id,
@@ -259,7 +259,7 @@ class TanzaniaSeeder extends Seeder
                 echo "Creating wards for {$districtName}:\n";
 
                 // Get the village for this district
-                $village = \App\Models\Village::where('district_id', $district->id)->first();
+                $village = village::where('district_id', $district->id)->first();
 
                 if (!$village) {
                     echo "  - No village found for {$districtName}, skipping wards\n";
