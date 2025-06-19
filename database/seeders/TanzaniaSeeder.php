@@ -3,9 +3,9 @@ namespace Database\Seeders;
 
 use App\Models\districts;
 use App\Models\regions;
+use App\Models\village;
 use Illuminate\Database\Seeder;
 use App\Models\Ward;
-use App\Models\Village;
 class TanzaniaSeeder extends Seeder
 {
     /**
@@ -44,7 +44,7 @@ class TanzaniaSeeder extends Seeder
             ]);
 
             // Create the default village with ID=1
-            \App\Models\village::create([
+               village::create([
                 'id' => 1,
                 'name' => 'Default Village',
                 'region_id' => $defaultRegion->id,
