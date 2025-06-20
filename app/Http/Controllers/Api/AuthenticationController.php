@@ -22,7 +22,7 @@ class AuthenticationController extends Controller
     {
         try {
             $validatedData = $request->validate([
-                'full_name' => 'required|string',
+                'full_name' => 'required|string', // Keep as full_name
                 'phone' => 'required|string|unique:candidates,phone',
                 'email' => 'required|email|unique:candidates,email',
                 'party_affiliation' => 'required|string',
@@ -34,12 +34,13 @@ class AuthenticationController extends Controller
                 'other_candidate_details' => 'nullable|string',
                 'password' => 'required|min:6'
             ]);
+
         } catch (ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
         }
 
         $user = Candidates::create([
-            'full_name' => $validatedData['full_name'],
+            'name' => $validatedData['full_name'], // Map full_name to name
             'email' => $validatedData['email'],
             'password' => Hash::make($validatedData['password']),
             'phone' => $validatedData['phone'],
@@ -59,7 +60,7 @@ class AuthenticationController extends Controller
             'message' => 'Registered successfully.',
             'data' => [
                 'user' => [
-                    'full_name' => $user->full_name,
+                    'full_name' => $user->name,
                     'email' => $user->email,
                     'position_id' => $user->position_id,
                     'phone' => $user->phone,
