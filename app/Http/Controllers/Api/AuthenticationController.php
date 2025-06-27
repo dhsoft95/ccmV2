@@ -20,6 +20,17 @@ class AuthenticationController extends Controller
 {
     public function register(Request $request)
     {
+        // Log the registration attempt with sanitized data
+        Log::info('Registration attempt started', [
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'email' => $request->input('email'),
+            'phone' => $request->input('phone'),
+            'position_id' => $request->input('position_id'),
+            'region_id' => $request->input('region_id'),
+            'timestamp' => now()
+        ]);
+
         try {
             $validatedData = $request->validate([
                 'full_name' => 'required|string',
@@ -34,39 +45,153 @@ class AuthenticationController extends Controller
                 'other_candidate_details' => 'nullable|string',
                 'password' => 'required|min:6'
             ]);
+
+            Log::info('Registration validation passed', [
+                'email' => $validatedData['email'],
+                'phone' => $validatedData['phone']
+            ]);
+
         } catch (ValidationException $e) {
+            Log::warning('Registration validation failed', [
+                'errors' => $e->errors(),
+                'email' => $request->input('email'),
+                'phone' => $request->input('phone'),
+                'ip' => $request->ip(),
+                'input_data' => $request->except(['password']) // Log input without password
+            ]);
+
             return response()->json(['errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            Log::error('Unexpected validation error during registration', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'email' => $request->input('email'),
+                'phone' => $request->input('phone'),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'error' => 'Registration failed',
+                'message' => 'An unexpected error occurred during validation'
+            ], 500);
         }
 
-        $user = Candidates::create([
-            'full_name' => $validatedData['full_name'],
-            'email' => $validatedData['email'],
-            'password' => Hash::make($validatedData['password']),
-            'phone' => $validatedData['phone'],
-            'party_affiliation' => $validatedData['party_affiliation'],
-            'position_id' => $validatedData['position_id'],
-            'region_id' => $validatedData['region_id'],
-            'village_id' => $validatedData['village_id'],
-            'ward_id' => $validatedData['ward_id'],
-            'district_id' => $validatedData['district_id'],
-            'other_candidate_details' => $validatedData['other_candidate_details']
-        ]);
+        try {
+            // Log before attempting to create candidate
+            Log::info('Attempting to create candidate record', [
+                'email' => $validatedData['email'],
+                'phone' => $validatedData['phone'],
+                'position_id' => $validatedData['position_id']
+            ]);
 
-        $token = $user->createToken('auth_token')->accessToken;
+            $user = Candidates::create([
+                'full_name' => $validatedData['full_name'],
+                'email' => $validatedData['email'],
+                'password' => Hash::make($validatedData['password']),
+                'phone' => $validatedData['phone'],
+                'party_affiliation' => $validatedData['party_affiliation'],
+                'position_id' => $validatedData['position_id'],
+                'region_id' => $validatedData['region_id'],
+                'village_id' => $validatedData['village_id'],
+                'ward_id' => $validatedData['ward_id'],
+                'district_id' => $validatedData['district_id'],
+                'other_candidate_details' => $validatedData['other_candidate_details']
+            ]);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Registered successfully.',
-            'data' => [
-                'user' => [
-                    'full_name' => $user->full_name,
-                    'email' => $user->email,
-                    'position_id' => $user->position_id,
-                    'phone' => $user->phone,
-                ],
-                'token' => $token
-            ]
-        ]);
+            Log::info('Candidate record created successfully', [
+                'candidate_id' => $user->id,
+                'email' => $user->email,
+                'phone' => $user->phone
+            ]);
+
+        } catch (\Illuminate\Database\QueryException $e) {
+            Log::error('Database error during candidate creation', [
+                'error_code' => $e->getCode(),
+                'error_message' => $e->getMessage(),
+                'sql' => $e->getSql() ?? 'N/A',
+                'bindings' => $e->getBindings() ?? [],
+                'email' => $validatedData['email'] ?? 'N/A',
+                'phone' => $validatedData['phone'] ?? 'N/A',
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
+            // Check for specific database errors
+            if ($e->getCode() === '23000') { // Integrity constraint violation
+                return response()->json([
+                    'error' => 'Registration failed',
+                    'message' => 'Email or phone number already exists'
+                ], 409);
+            }
+
+            return response()->json([
+                'error' => 'Registration failed',
+                'message' => 'Database error occurred. Please try again.'
+            ], 500);
+
+        } catch (\Exception $e) {
+            Log::error('Unexpected error during candidate creation', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'email' => $validatedData['email'] ?? 'N/A',
+                'phone' => $validatedData['phone'] ?? 'N/A',
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'error' => 'Registration failed',
+                'message' => 'An unexpected error occurred'
+            ], 500);
+        }
+
+        try {
+            // Log before token creation
+            Log::info('Attempting to create access token', [
+                'candidate_id' => $user->id,
+                'email' => $user->email
+            ]);
+
+            $token = $user->createToken('auth_token')->accessToken;
+
+            Log::info('Registration completed successfully', [
+                'candidate_id' => $user->id,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'position_id' => $user->position_id,
+                'token_created' => true
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Registered successfully.',
+                'data' => [
+                    'user' => [
+                        'full_name' => $user->full_name,
+                        'email' => $user->email,
+                        'position_id' => $user->position_id,
+                        'phone' => $user->phone,
+                    ],
+                    'token' => $token
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Token creation failed during registration', [
+                'candidate_id' => $user->id ?? 'N/A',
+                'email' => $user->email ?? 'N/A',
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'error' => 'Registration completed but token creation failed',
+                'message' => 'Please try logging in manually'
+            ], 500);
+        }
     }
 
     public function login(Request $request)
