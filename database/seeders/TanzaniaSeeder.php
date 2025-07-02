@@ -380,7 +380,7 @@ class TanzaniaSeeder extends Seeder
                         'region_id' => $district->region_id,
                         'district_id' => $district->id,
                         'village_id' => $village->id,
-                        'other_ward_details' => "Ward of {$wardName} in {$districtName} district"
+                        'other_villages_details' => "Ward of {$wardName} in {$districtName} district"
                     ]);
                 }
             }
