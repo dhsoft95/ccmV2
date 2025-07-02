@@ -208,6 +208,9 @@ class TanzaniaSeeder extends Seeder
             'Musoma Municipal', 'Kasulu Town', 'Babati Town', 'Makambako Town',
             'Njombe Town', 'Kibaha Town', 'Geita Town', 'Mafinga Town',
 
+            // Moshi Rural (for wards like Kirua Vunjo Magharibi)
+            'Moshi Rural',
+
             // Special case - Rungwe (since you had its ward data)
             'Rungwe'
         ];
@@ -281,6 +284,13 @@ class TanzaniaSeeder extends Seeder
             // Moshi wards
             'Moshi Municipal' => [
                 'Bondeni', 'Kiboriloni', 'Kilimanjaro', 'Kiusa', 'Korongoni', 'Longuo', 'Majengo', 'Mabogini', 'Msaranga', 'Rau'
+            ],
+
+            // Moshi Rural wards
+            'Moshi Rural' => [
+                'Kirua Vunjo Magharibi', 'Marangu East', 'Marangu West', 'Mwika', 'Old Moshi East', 'Old Moshi West',
+                'Uru Kaskazini', 'Uru Kusini', 'Uru Mashariki', 'Uru Shimbwe', 'Chekereni', 'Kahe', 'Kimochi',
+                'Kirua Vunjo Mashariki', 'Machame Kaskazini', 'Machame Kusini', 'Machame Mashariki', 'Machame Magharibi'
             ],
 
             // Iringa wards
