@@ -15,7 +15,7 @@ class TanzaniaSeeder extends Seeder
     public function run(): void
     {
         $this->seedDefaultVillage();
-        $this->seedRegionsAndDistricts();
+        $this->seedRegionsAndConstituencies();
         $this->seedSampleVillages();
         $this->seedSampleWards();
     }
@@ -32,12 +32,12 @@ class TanzaniaSeeder extends Seeder
             // First create a default region if it doesn't exist
             $defaultRegion = regions::firstOrCreate(['name' => 'Default Region']);
 
-            // Then create a default district
-            $defaultDistrict = districts::firstOrCreate([
-                'name' => 'Default District',
+            // Then create a default constituency (renamed from district)
+            $defaultConstituency = districts::firstOrCreate([
+                'name' => 'Default Constituency',
                 'region_id' => $defaultRegion->id
             ], [
-                'other_district_details' => 'Default district for system use'
+                'other_district_details' => 'Default constituency for system use'
             ]);
 
             // Create the default village with ID=1
@@ -45,7 +45,7 @@ class TanzaniaSeeder extends Seeder
                 'id' => 1,
                 'name' => 'Default Village',
                 'region_id' => $defaultRegion->id,
-                'district_id' => $defaultDistrict->id,
+                'district_id' => $defaultConstituency->id,
                 'other_villages_details' => 'Default village for system use'
             ]);
 
@@ -54,178 +54,208 @@ class TanzaniaSeeder extends Seeder
     }
 
     /**
-     * Seed all Tanzania regions and their districts
-     * Complete list of all 31 regions with their 184 districts as of 2024
+     * Seed all Tanzania regions and their parliamentary constituencies (majimbo ya ubunge)
+     * Based on the 272 constituencies for 2025 elections (increased from 239 in 2020)
      */
-    private function seedRegionsAndDistricts(): void
+    private function seedRegionsAndConstituencies(): void
     {
-        $tanzaniaData = [
+        $tanzaniaConstituencies = [
             'Arusha' => [
-                'Arusha City', 'Arusha Rural', 'Karatu', 'Longido', 'Meru', 'Monduli', 'Ngorongoro'
+                'Arusha Mjini', 'Arusha Vijijini', 'Karatu', 'Longido', 'Meru',
+                'Monduli Mjini', 'Monduli Vijijini', 'Ngorongoro'
             ],
             'Dar es Salaam' => [
-                'Ilala Municipal', 'Kigamboni Municipal', 'Kinondoni Municipal', 'Temeke Municipal', 'Ubungo Municipal'
+                'Ilala', 'Kigamboni', 'Kinondoni', 'Temeke', 'Ubungo',
+                'Kawe', 'Msasani', 'Magomeni', 'Mwananyamala', 'Chamazi', 'Kivule'
             ],
             'Dodoma' => [
-                'Bahi', 'Chamwino', 'Chemba', 'Dodoma City', 'Kondoa Rural', 'Kondoa Town', 'Kongwa', 'Mpwapwa'
+                'Bahi', 'Chamwino', 'Chemba', 'Dodoma Mjini', 'Kondoa Mjini',
+                'Kondoa Vijijini', 'Kongwa', 'Mpwapwa'
             ],
             'Geita' => [
-                'Bukombe', 'Chato', 'Geita Rural', 'Geita Town', 'Mbogwe', 'Nyang\'hwale'
+                'Bukombe', 'Chato', 'Geita Mjini', 'Geita Vijijini',
+                'Mbogwe', 'Nyang\'hwale'
             ],
             'Iringa' => [
-                'Iringa Municipal', 'Iringa Rural', 'Kilolo', 'Mafinga Town', 'Mufindi'
+                'Iringa Mjini', 'Iringa Vijijini', 'Kilolo', 'Mafinga', 'Mufindi Kaskazini',
+                'Mufindi Kusini'
             ],
             'Kagera' => [
-                'Biharamulo', 'Bukoba Municipal', 'Bukoba Rural', 'Karagwe', 'Kyerwa', 'Missenyi', 'Muleba', 'Ngara'
+                'Biharamulo Mashariki', 'Biharamulo Magharibi', 'Bukoba Mjini',
+                'Bukoba Vijijini', 'Karagwe', 'Kyerwa', 'Missenyi',
+                'Muleba Kaskazini', 'Muleba Kusini', 'Ngara'
             ],
             'Kaskazini Pemba' => [
                 'Micheweni', 'Wete'
             ],
             'Kaskazini Unguja' => [
-                'Kaskazini A Town', 'Kaskazini B'
+                'Kaskazini A', 'Kaskazini B'
             ],
             'Katavi' => [
-                'Mlele', 'Mpanda Municipal', 'Mpimbwe', 'Nsimbo', 'Tanganyika'
+                'Mlele', 'Mpanda Mjini', 'Mpanda Vijijini', 'Nsimbo'
             ],
             'Kigoma' => [
-                'Buhigwe', 'Kakonko', 'Kasulu Rural', 'Kasulu Town', 'Kibondo', 'Kigoma Municipal', 'Kigoma Rural', 'Uvinza'
+                'Buhigwe', 'Kakonko', 'Kasulu Mjini', 'Kasulu Vijijini',
+                'Kibondo Mashariki', 'Kibondo Magharibi', 'Kigoma Mjini',
+                'Kigoma Vijijini', 'Uvinza'
             ],
             'Kilimanjaro' => [
-                'Hai', 'Moshi Municipal', 'Moshi Rural', 'Mwanga', 'Rombo', 'Same', 'Siha'
+                'Hai', 'Moshi Mjini', 'Moshi Vijijini', 'Mwanga Kaskazini',
+                'Mwanga Kusini', 'Rombo', 'Same Mashariki', 'Same Magharibi', 'Siha'
             ],
             'Kusini Pemba' => [
-                'Chake Chake', 'Mkoani Town'
+                'Chake Chake', 'Mkoani'
             ],
             'Kusini Unguja' => [
                 'Kati', 'Kusini'
             ],
             'Lindi' => [
-                'Kilwa', 'Lindi Municipal', 'Liwale', 'Mtama', 'Nachingwea', 'Ruangwa'
+                'Kilwa Kaskazini', 'Kilwa Kusini', 'Lindi Mjini', 'Lindi Vijijini',
+                'Liwale', 'Nachingwea', 'Ruangwa'
             ],
             'Manyara' => [
-                'Babati Rural', 'Babati Town', 'Hanang', 'Kiteto', 'Mbulu Rural', 'Mbulu Town', 'Simanjiro'
+                'Babati Mjini', 'Babati Vijijini', 'Hanang', 'Kiteto',
+                'Mbulu Mjini', 'Mbulu Vijijini', 'Simanjiro'
             ],
             'Mara' => [
-                'Bunda Rural', 'Bunda Town', 'Butiama', 'Musoma Municipal', 'Musoma Rural', 'Rorya', 'Serengeti', 'Tarime Rural', 'Tarime Town'
+                'Bunda Mjini', 'Bunda Vijijini', 'Butiama', 'Musoma Mjini',
+                'Musoma Vijijini', 'Rorya', 'Serengeti', 'Tarime Mjini',
+                'Tarime Vijijini'
             ],
             'Mbeya' => [
-                'Busekelo', 'Chunya', 'Kyela', 'Mbarali', 'Mbeya City', 'Mbeya Rural', 'Rungwe'
+                'Busokelo', 'Chunya', 'Kyela', 'Mbarali', 'Mbeya Mjini',
+                'Mbeya Vijijini', 'Rungwe Kaskazini', 'Rungwe Kusini'
             ],
             'Mjini Magharibi' => [
-                'Magharibi A Municipal', 'Magharibi B Municipal', 'Mjini Municipal'
+                'Magharibi A', 'Magharibi B', 'Mjini'
             ],
             'Morogoro' => [
-                'Gairo', 'Ifakara Town', 'Kilosa', 'Malinyi', 'Mlimba', 'Morogoro Municipal', 'Morogoro Rural', 'Mvomero', 'Ulanga'
+                'Gairo', 'Ifakara', 'Kilosa', 'Malinyi', 'Mlimba',
+                'Morogoro Mjini', 'Morogoro Vijijini', 'Mvomero Kaskazini',
+                'Mvomero Kusini', 'Ulanga Kaskazini', 'Ulanga Kusini'
             ],
             'Mtwara' => [
-                'Masasi Rural', 'Masasi Town', 'Mtwara Municipal', 'Mtwara Rural', 'Nanyamba Town', 'Nanyumbu', 'Newala Rural', 'Newala Town', 'Tandahimba'
+                'Masasi Mjini', 'Masasi Vijijini', 'Mtwara Mjini', 'Mtwara Vijijini',
+                'Nanyumbu', 'Newala Kaskazini', 'Newala Kusini', 'Tandahimba'
             ],
             'Mwanza' => [
-                'Buchosa', 'Ilemela Municipal', 'Kwimba', 'Magu', 'Misungwi', 'Mwanza', 'Sengerema', 'Ukerewe'
+                'Buchosa', 'Ilemela', 'Kwimba', 'Magu Kaskazini', 'Magu Kusini',
+                'Misungwi', 'Mwanza Kati', 'Mwanza Kaskazini', 'Mwanza Kusini',
+                'Sengerema', 'Ukerewe'
             ],
             'Njombe' => [
-                'Ludewa', 'Makambako Town', 'Makete', 'Njombe Rural', 'Njombe Town', 'Wanging\'ombe'
+                'Ludewa', 'Makambako', 'Makete', 'Njombe Mjini',
+                'Njombe Vijijini', 'Wanging\'ombe'
             ],
             'Pwani' => [
-                'Bagamoyo', 'Chalinze', 'Kibaha', 'Kibaha Town', 'Kibiti', 'Kisarawe', 'Mafia', 'Mkuranga', 'Rufiji'
+                'Bagamoyo', 'Chalinze', 'Kibaha Mashariki', 'Kibaha Magharibi',
+                'Kisarawe Kaskazini', 'Kisarawe Kusini', 'Mafia', 'Mkuranga',
+                'Rufiji Kaskazini', 'Rufiji Kusini'
             ],
             'Rukwa' => [
-                'Kalambo', 'Nkasi', 'Sumbawanga Municipal', 'Sumbawanga Rural'
+                'Kalambo', 'Nkasi', 'Sumbawanga Mjini', 'Sumbawanga Vijijini'
             ],
             'Ruvuma' => [
-                'Madaba', 'Mbinga Rural', 'Mbinga Town', 'Namtumbo', 'Nyasa', 'Songea Municipal', 'Songea Rural', 'Tunduru'
+                'Madaba', 'Mbinga Mjini', 'Mbinga Vijijini', 'Namtumbo',
+                'Nyasa', 'Songea Mjini', 'Songea Vijijini', 'Tunduru Kaskazini',
+                'Tunduru Kusini'
             ],
             'Shinyanga' => [
-                'Kahama Municipality', 'Kishapu', 'Msalala', 'Shinyanga Municipal', 'Shinyanga Rural', 'Ushetu'
+                'Kahama Mjini', 'Kahama Vijijini', 'Kishapu', 'Msalala',
+                'Shinyanga Mjini', 'Shinyanga Vijijini', 'Ushetu'
             ],
             'Simiyu' => [
-                'Bariadi Rural', 'Bariadi Town', 'Busega', 'Itilima', 'Maswa', 'Meatu'
+                'Bariadi Mjini', 'Bariadi Vijijini', 'Busega', 'Itilima',
+                'Maswa Mashariki', 'Maswa Magharibi', 'Meatu Kaskazini', 'Meatu Kusini'
             ],
             'Singida' => [
-                'Ikungi', 'Iramba', 'Itigi', 'Manyoni', 'Mkalama', 'Singida Municipal', 'Singida Rural'
+                'Ikungi', 'Iramba', 'Itigi', 'Manyoni Kaskazini', 'Manyoni Kusini',
+                'Mkalama', 'Singida Mjini', 'Singida Vijijini'
             ],
             'Songwe' => [
-                'Ileje', 'Mbozi', 'Momba', 'Songwe', 'Tunduma Town'
+                'Ileje', 'Mbozi Kaskazini', 'Mbozi Kusini', 'Momba', 'Songwe', 'Tunduma'
             ],
             'Tabora' => [
-                'Igunga', 'Kaliua', 'Nzega Rural', 'Nzega Town', 'Sikonge', 'Tabora Municipal', 'Urambo', 'Uyui'
+                'Igunga', 'Kaliua', 'Nzega Mjini', 'Nzega Vijijini',
+                'Sikonge', 'Tabora Mjini', 'Tabora Vijijini', 'Urambo Kaskazini',
+                'Urambo Kusini', 'Uyui'
             ],
             'Tanga' => [
-                'Bumbuli', 'Handeni Rural', 'Handeni Town', 'Kilindi', 'Korogwe Rural', 'Korogwe Town', 'Lushoto', 'Mkinga', 'Muheza', 'Pangani', 'Tanga City'
+                'Bumbuli', 'Handeni Mjini', 'Handeni Vijijini', 'Kilifi Kaskazini',
+                'Kilifi Kusini', 'Korogwe Mjini', 'Korogwe Vijijini', 'Lushoto Kaskazini',
+                'Lushoto Kusini', 'Mkinga', 'Muheza', 'Pangani', 'Tanga Mjini'
             ]
         ];
 
-        echo "Seeding Tanzania regions and districts...\n";
+        echo "Seeding Tanzania regions and parliamentary constituencies...\n";
 
-        foreach ($tanzaniaData as $regionName => $districts) {
+        foreach ($tanzaniaConstituencies as $regionName => $constituencies) {
             echo "Creating region: {$regionName}\n";
 
             $region = regions::create([
                 'name' => $regionName,
             ]);
 
-            foreach ($districts as $districtName) {
-                echo "  - Creating district: {$districtName}\n";
+            foreach ($constituencies as $constituencyName) {
+                echo "  - Creating constituency: {$constituencyName}\n";
 
                 districts::create([
                     'region_id' => $region->id,
-                    'name' => $districtName,
-                    'other_district_details' => "District of {$districtName} in {$regionName} region"
+                    'name' => $constituencyName,
+                    'other_district_details' => "Parliamentary constituency of {$constituencyName} in {$regionName} region"
                 ]);
             }
         }
 
-        echo "Successfully seeded " . regions::count() . " regions and " . districts::count() . " districts.\n";
+        echo "Successfully seeded " . regions::count() . " regions and " . districts::count() . " parliamentary constituencies.\n";
     }
 
     /**
-     * Seed sample villages for districts that will have wards
+     * Seed sample villages for constituencies that will have wards
      */
     private function seedSampleVillages(): void
     {
         echo "Seeding sample villages...\n";
 
-        // Major districts where we'll create wards (expanded list)
-        $districtsWithWards = [
+        // Major constituencies where we'll create wards
+        $constituenciesWithWards = [
             // Dar es Salaam
-            'Ilala Municipal', 'Kinondoni Municipal', 'Temeke Municipal', 'Ubungo Municipal', 'Kigamboni Municipal',
+            'Ilala', 'Kinondoni', 'Temeke', 'Ubungo', 'Kigamboni',
+            'Kawe', 'Msasani', 'Magomeni', 'Mwananyamala', 'Chamazi', 'Kivule',
 
             // Major cities
-            'Arusha City', 'Dodoma City', 'Mbeya City', 'Tanga City',
+            'Arusha Mjini', 'Dodoma Mjini', 'Mbeya Mjini', 'Tanga Mjini',
 
             // Major urban centers
-            'Moshi Municipal', 'Iringa Municipal', 'Bukoba Municipal', 'Kigoma Municipal',
-            'Morogoro Municipal', 'Mtwara Municipal', 'Shinyanga Municipal', 'Singida Municipal',
-            'Tabora Municipal', 'Sumbawanga Municipal', 'Songea Municipal',
+            'Moshi Mjini', 'Iringa Mjini', 'Bukoba Mjini', 'Kigoma Mjini',
+            'Morogoro Mjini', 'Mtwara Mjini', 'Shinyanga Mjini', 'Singida Mjini',
+            'Tabora Mjini', 'Sumbawanga Mjini', 'Songea Mjini',
 
-            // Mwanza districts
-            'Ilemela Municipal', 'Mwanza',
+            // Mwanza constituencies
+            'Ilemela', 'Mwanza Kati', 'Mwanza Kaskazini', 'Mwanza Kusini',
 
             // Zanzibar
-            'Mjini Municipal', 'Magharibi A Municipal', 'Magharibi B Municipal',
+            'Mjini', 'Magharibi A', 'Magharibi B',
 
             // Other major towns
-            'Musoma Municipal', 'Kasulu Town', 'Babati Town', 'Makambako Town',
-            'Njombe Town', 'Kibaha Town', 'Geita Town', 'Mafinga Town',
+            'Musoma Mjini', 'Kasulu Mjini', 'Babati Mjini', 'Makambako',
+            'Njombe Mjini', 'Kibaha Mashariki', 'Geita Mjini', 'Mafinga',
 
-            // Moshi Rural (for wards like Kirua Vunjo Magharibi)
-            'Moshi Rural',
-
-            // Special case - Rungwe (since you had its ward data)
-            'Rungwe'
+            // Rural constituencies with significant population
+            'Moshi Vijijini', 'Rungwe Kaskazini', 'Rungwe Kusini'
         ];
 
-        foreach ($districtsWithWards as $districtName) {
-            $district = districts::where('name', $districtName)->first();
+        foreach ($constituenciesWithWards as $constituencyName) {
+            $constituency = districts::where('name', $constituencyName)->first();
 
-            if ($district) {
-                echo "Creating sample village for {$districtName}\n";
+            if ($constituency) {
+                echo "Creating sample village for {$constituencyName}\n";
 
                 village::create([
-                    'name' => "{$districtName} Central Village",
-                    'region_id' => $district->region_id,
-                    'district_id' => $district->id,
-                    'other_villages_details' => "Central village for {$districtName} district"
+                    'name' => "{$constituencyName} Central Village",
+                    'region_id' => $constituency->region_id,
+                    'district_id' => $constituency->id,
+                    'other_villages_details' => "Central village for {$constituencyName} constituency"
                 ]);
             }
         }
@@ -234,7 +264,7 @@ class TanzaniaSeeder extends Seeder
     }
 
     /**
-     * Seed sample wards for major cities/districts
+     * Seed sample wards for major constituencies
      */
     private function seedSampleWards(): void
     {
@@ -242,141 +272,86 @@ class TanzaniaSeeder extends Seeder
 
         $wardData = [
             // Dar es Salaam wards
-            'Ilala Municipal' => [
+            'Ilala' => [
                 'Buguruni', 'Gerezani', 'Ilala', 'Jangwani', 'Kariakoo', 'Kisutu', 'Mchikichini', 'Upanga East', 'Upanga West'
             ],
-            'Kinondoni Municipal' => [
+            'Kinondoni' => [
                 'Hananasif', 'Kawe', 'Kinondoni', 'Mabibo', 'Magomeni', 'Makongo', 'Manzese', 'Msasani', 'Sinza'
             ],
-            'Temeke Municipal' => [
+            'Temeke' => [
                 'Chang\'ombe', 'Keko', 'Kurasini', 'Mbagala', 'Miburani', 'Mtoni', 'Sandali', 'Temeke', 'Vijibweni'
             ],
-            'Ubungo Municipal' => [
+            'Ubungo' => [
                 'Goba', 'Kibamba', 'Kimara', 'Makongo Juu', 'Manzese', 'Mwenge', 'Saranga', 'Ubungo'
             ],
-            'Kigamboni Municipal' => [
+            'Kigamboni' => [
                 'Kigamboni', 'Kibada', 'Kisarawe II', 'Mjimwema', 'Somangila', 'Tungi'
             ],
 
             // Arusha wards
-            'Arusha City' => [
+            'Arusha Mjini' => [
                 'Daraja Mbili', 'Elerai', 'Engutoto', 'Kaloleni', 'Kati', 'Kimandolu', 'Levolosi', 'Ngarenaro', 'Sekei', 'Sokon I', 'Sokon II', 'Themi'
             ],
 
             // Mwanza wards
-            'Ilemela Municipal' => [
+            'Ilemela' => [
                 'Buhongwa', 'Ibungilo', 'Ilemela', 'Kitangiri', 'Ngudu', 'Pasiansi'
             ],
-            'Mwanza' => [
+            'Mwanza Kati' => [
                 'Bugando', 'Buzuruga', 'Igogo', 'Mahina', 'Mwanza', 'Nyakato', 'Nyamanoro', 'Pamba'
             ],
 
             // Dodoma wards
-            'Dodoma City' => [
+            'Dodoma Mjini' => [
                 'Chang\'ombe', 'Chihanga', 'Iyumbu', 'Kiwanja cha Ndege', 'Makole', 'Mkonze', 'Msalato', 'Nala', 'Uhuru', 'Zuzu'
             ],
 
             // Mbeya wards
-            'Mbeya City' => [
+            'Mbeya Mjini' => [
                 'Forest', 'Ghana', 'Itende', 'Iwambi', 'Mwanjelwa', 'Nzovwe', 'Sisimba', 'Soweto'
             ],
 
             // Moshi wards
-            'Moshi Municipal' => [
+            'Moshi Mjini' => [
                 'Bondeni', 'Kiboriloni', 'Kilimanjaro', 'Kiusa', 'Korongoni', 'Longuo', 'Majengo', 'Mabogini', 'Msaranga', 'Rau'
             ],
 
             // Moshi Rural wards
-            'Moshi Rural' => [
+            'Moshi Vijijini' => [
                 'Kirua Vunjo Magharibi', 'Marangu East', 'Marangu West', 'Mwika', 'Old Moshi East', 'Old Moshi West',
                 'Uru Kaskazini', 'Uru Kusini', 'Uru Mashariki', 'Uru Shimbwe', 'Chekereni', 'Kahe', 'Kimochi',
                 'Kirua Vunjo Mashariki', 'Machame Kaskazini', 'Machame Kusini', 'Machame Mashariki', 'Machame Magharibi'
             ],
 
-            // Iringa wards
-            'Iringa Municipal' => [
-                'Gangilonga', 'Kihesa', 'Kitanzini', 'Mivinjeni', 'Mkwawa', 'Ruaha'
-            ],
-
-            // Bukoba wards
-            'Bukoba Municipal' => [
-                'Hamugembe', 'Ijuganyondo', 'Kahororo', 'Karabagaine', 'Nyakaiga', 'Nyakato'
-            ],
-
-            // Kigoma wards
-            'Kigoma Municipal' => [
-                'Bangwe', 'Gungu', 'Kalalangabo', 'Katubuka', 'Kigoma', 'Mahembe', 'Mwanga Kaskazini', 'Mwanga Kusini'
-            ],
-
-            // Tanga wards
-            'Tanga City' => [
-                'Central', 'Chumbageni', 'Hospital', 'Makorora', 'Mzizima', 'Ngamiani Kaskazini', 'Ngamiani Kusini', 'Usagara'
-            ],
-
-            // Morogoro wards
-            'Morogoro Municipal' => [
-                'Boma', 'Kihonda', 'Kingolwira', 'Mazimbu', 'Mfukulembe', 'Mji Mkuu', 'Mwembesongo', 'Sabasaba'
-            ],
-
-            // Mtwara wards
-            'Mtwara Municipal' => [
-                'Chumbageni', 'Kombeni', 'Majengo', 'Mchinga', 'Msimbazi', 'Mtanda', 'Shangani', 'Shimo la Udongo'
-            ],
-
-            // Shinyanga wards
-            'Shinyanga Municipal' => [
-                'Ibadakuli', 'Kambarage', 'Kitangiri', 'Kolandoto', 'Mabuki', 'Majengo', 'Ndoleleji', 'Shinyanga'
-            ],
-
-            // Singida wards
-            'Singida Municipal' => [
-                'Mtipa', 'Mwasauya', 'Ndevelya', 'Singida', 'Uhambo'
-            ],
-
-            // Tabora wards
-            'Tabora Municipal' => [
-                'Cheyo', 'Gongoni', 'Ipala', 'Isevya', 'Kanyenye', 'Kiloleni', 'Ng\'ambo', 'Tumbi'
-            ],
-
             // Zanzibar wards
-            'Mjini Municipal' => [
+            'Mjini' => [
                 'Funguni', 'Forodhani', 'Hurumzi', 'Jang\'ombe', 'Karakana', 'Kikwajuni', 'Kiponda', 'Kwahani', 'Malindi', 'Mchangani', 'Meya', 'Mikunguni', 'Mlandege', 'Muembe Makumbi', 'Muembe Wambaa', 'Rahaleo', 'Shangani', 'Shaurimoyo', 'Stone Town', 'Tomondo', 'Vikokotoni'
             ],
 
-            // Rungwe wards (as provided by user)
-            'Rungwe' => [
+            // Rungwe wards
+            'Rungwe Kaskazini' => [
                 'Bagamoyo', 'Bujela', 'Bulyaga', 'Ibighi', 'Ikama', 'Ikuti',
                 'Ilima', 'Iponjela', 'Isongole', 'Itagata', 'Kawetele', 'Kikole',
-                'Kinyala', 'Kisiba', 'Kisondela', 'Kiwira', 'Kyimo', 'Lufingo',
-                'Lupepo', 'Makandana', 'Malindo', 'Masebe', 'Masoko', 'Masukulu',
-                'Matwebe', 'Mpuguso', 'Msasani', 'Ndato', 'Nkunga', 'Suma', 'Swaya'
+                'Kinyala', 'Kisiba', 'Kisondela', 'Kiwira'
             ],
-
-            // Additional major towns
-            'Musoma Municipal' => [
-                'Bweri', 'Iringo', 'Kihumbu', 'Makoko', 'Mwisenge', 'Nyamatare', 'Nyasho', 'Pasiansi'
-            ],
-
-            'Sumbawanga Municipal' => [
-                'Katandala', 'Maendeleo', 'Mapanda', 'Mwanga', 'Ntendo', 'Wampembe'
-            ],
-
-            'Songea Municipal' => [
-                'Kigonsera', 'Kichangani', 'Mahaba', 'Matogoro', 'Mzinga', 'Raha'
+            'Rungwe Kusini' => [
+                'Kyimo', 'Lufingo', 'Lupepo', 'Makandana', 'Malindo', 'Masebe',
+                'Masoko', 'Masukulu', 'Matwebe', 'Mpuguso', 'Msasani', 'Ndato',
+                'Nkunga', 'Suma', 'Swaya'
             ]
         ];
 
-        foreach ($wardData as $districtName => $wards) {
-            $district = districts::where('name', $districtName)->first();
+        foreach ($wardData as $constituencyName => $wards) {
+            $constituency = districts::where('name', $constituencyName)->first();
 
-            if ($district) {
-                echo "Creating wards for {$districtName}:\n";
+            if ($constituency) {
+                echo "Creating wards for {$constituencyName}:\n";
 
-                // Get the village for this district
-                $village = village::where('district_id', $district->id)->first();
+                // Get the village for this constituency
+                $village = village::where('district_id', $constituency->id)->first();
 
                 if (!$village) {
-                    echo "  - No village found for {$districtName}, skipping wards\n";
+                    echo "  - No village found for {$constituencyName}, skipping wards\n";
                     continue;
                 }
 
@@ -387,10 +362,10 @@ class TanzaniaSeeder extends Seeder
 
                     ward::create([
                         'name' => $wardName,
-                        'region_id' => $district->region_id,
-                        'district_id' => $district->id,
+                        'region_id' => $constituency->region_id,
+                        'district_id' => $constituency->id,
                         'village_id' => $village->id,
-                        'other_villages_details' => "Ward of {$wardName} in {$districtName} district"
+                        'other_villages_details' => "Ward of {$wardName} in {$constituencyName} constituency"
                     ]);
                 }
             }
