@@ -65,8 +65,9 @@ class TanzaniaSeeder extends Seeder
                 'Monduli Mjini', 'Monduli Vijijini', 'Ngorongoro'
             ],
             'Dar es Salaam' => [
-                'Ilala', 'Kigamboni', 'Kinondoni', 'Temeke', 'Ubungo',
-                'Kawe', 'Msasani', 'Magomeni', 'Mwananyamala', 'Chamazi', 'Kivule'
+                'Ilala', 'Kawe', 'Kibamba', 'Kigamboni', 'Kinondoni',
+                'Mbagala', 'Segerea', 'Temeke', 'Ubungo', 'Ukonga',
+                'Chamazi', 'Kivule'
             ],
             'Dodoma' => [
                 'Bahi', 'Chamwino', 'Chemba', 'Dodoma Mjini', 'Kondoa Mjini',
@@ -100,8 +101,8 @@ class TanzaniaSeeder extends Seeder
                 'Kigoma Vijijini', 'Uvinza'
             ],
             'Kilimanjaro' => [
-                'Hai', 'Moshi Mjini', 'Moshi Vijijini', 'Mwanga Kaskazini',
-                'Mwanga Kusini', 'Rombo', 'Same Mashariki', 'Same Magharibi', 'Siha'
+                'Hai', 'Siha', 'Moshi Mjini', 'Mwanga', 'Same Mashariki',
+                'Same Magharibi', 'Moshi Vijijini', 'Vunjo', 'Rombo'
             ],
             'Kusini Pemba' => [
                 'Chake Chake', 'Mkoani'
@@ -123,8 +124,8 @@ class TanzaniaSeeder extends Seeder
                 'Tarime Vijijini'
             ],
             'Mbeya' => [
-                'Busokelo', 'Chunya', 'Kyela', 'Mbarali', 'Mbeya Mjini',
-                'Mbeya Vijijini', 'Rungwe Kaskazini', 'Rungwe Kusini'
+                'Ileje', 'Kyela', 'Lupa', 'Mbarali', 'Mbeya Mjini',
+                'Mbeya Vijijini', 'Mbozi', 'Momba', 'Rungwe', 'Vwawa'
             ],
             'Mjini Magharibi' => [
                 'Magharibi A', 'Magharibi B', 'Mjini'
@@ -173,7 +174,7 @@ class TanzaniaSeeder extends Seeder
                 'Mkalama', 'Singida Mjini', 'Singida Vijijini'
             ],
             'Songwe' => [
-                'Ileje', 'Mbozi Kaskazini', 'Mbozi Kusini', 'Momba', 'Songwe', 'Tunduma'
+                'Songwe', 'Tunduma'
             ],
             'Tabora' => [
                 'Igunga', 'Kaliua', 'Nzega Mjini', 'Nzega Vijijini',
@@ -220,8 +221,9 @@ class TanzaniaSeeder extends Seeder
         // Major constituencies where we'll create wards
         $constituenciesWithWards = [
             // Dar es Salaam
-            'Ilala', 'Kinondoni', 'Temeke', 'Ubungo', 'Kigamboni',
-            'Kawe', 'Msasani', 'Magomeni', 'Mwananyamala', 'Chamazi', 'Kivule',
+            'Ilala', 'Kawe', 'Kibamba', 'Kigamboni', 'Kinondoni',
+            'Mbagala', 'Segerea', 'Temeke', 'Ubungo', 'Ukonga',
+            'Chamazi', 'Kivule',
 
             // Major cities
             'Arusha Mjini', 'Dodoma Mjini', 'Mbeya Mjini', 'Tanga Mjini',
@@ -242,7 +244,7 @@ class TanzaniaSeeder extends Seeder
             'Njombe Mjini', 'Kibaha Mashariki', 'Geita Mjini', 'Mafinga',
 
             // Rural constituencies with significant population
-            'Moshi Vijijini', 'Rungwe Kaskazini', 'Rungwe Kusini'
+            'Moshi Vijijini', 'Vunjo', 'Rungwe', 'Vwawa'
         ];
 
         foreach ($constituenciesWithWards as $constituencyName) {
@@ -329,15 +331,12 @@ class TanzaniaSeeder extends Seeder
             ],
 
             // Rungwe wards
-            'Rungwe Kaskazini' => [
+            'Rungwe' => [
                 'Bagamoyo', 'Bujela', 'Bulyaga', 'Ibighi', 'Ikama', 'Ikuti',
                 'Ilima', 'Iponjela', 'Isongole', 'Itagata', 'Kawetele', 'Kikole',
-                'Kinyala', 'Kisiba', 'Kisondela', 'Kiwira'
-            ],
-            'Rungwe Kusini' => [
-                'Kyimo', 'Lufingo', 'Lupepo', 'Makandana', 'Malindo', 'Masebe',
-                'Masoko', 'Masukulu', 'Matwebe', 'Mpuguso', 'Msasani', 'Ndato',
-                'Nkunga', 'Suma', 'Swaya'
+                'Kinyala', 'Kisiba', 'Kisondela', 'Kiwira', 'Kyimo', 'Lufingo',
+                'Lupepo', 'Makandana', 'Malindo', 'Masebe', 'Masoko', 'Masukulu',
+                'Matwebe', 'Mpuguso', 'Msasani', 'Ndato', 'Nkunga', 'Suma', 'Swaya'
             ]
         ];
 
