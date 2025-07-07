@@ -40,8 +40,8 @@ class AuthenticationController extends Controller
                 'position_id' => 'required|exists:positions,id',
                 'region_id' => 'required|exists:regions,id',
                 'village_id' => 'required',
-//                'ward_id' => 'exists:wards,id',
-//                'district_id' => 'required|exists:districts,id',
+                'ward_id' => 'exists:wards',
+                'district_id' => 'required|exists:districts,id',
                 'other_candidate_details' => 'nullable|string',
                 'password' => 'required|min:6'
             ]);
@@ -98,7 +98,7 @@ class AuthenticationController extends Controller
                 'district_id' => $validatedData['district_id'],
                 'other_candidate_details' => $validatedData['other_candidate_details']
             ]);
-
+            // Log successful candidate creation
             Log::info('Candidate record created successfully', [
                 'candidate_id' => $user->id,
                 'email' => $user->email,
