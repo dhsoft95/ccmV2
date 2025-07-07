@@ -9,9 +9,11 @@ use Illuminate\Database\Seeder;
 
 class TanzaniaSeeder extends Seeder
 {
+
     /**
      * Run the database seeds.
      */
+
     public function run(): void
     {
         $this->seedDefaultVillage();
@@ -19,7 +21,6 @@ class TanzaniaSeeder extends Seeder
         $this->seedSampleVillages();
         $this->seedSampleWards();
     }
-
     /**
      * Seed the default village with ID=1
      * This is necessary because wards table references village with ID=1 as default
@@ -235,8 +236,9 @@ class TanzaniaSeeder extends Seeder
 
             // Mwanza constituencies
             'Ilemela', 'Mwanza Kati', 'Mwanza Kaskazini', 'Mwanza Kusini',
+            'Sengerema', 'Ukerewe',
 
-            // Zanzibar
+            // Zanzibar constituencies
             'Mjini', 'Magharibi A', 'Magharibi B',
 
             // Other major towns
@@ -247,6 +249,7 @@ class TanzaniaSeeder extends Seeder
             'Moshi Vijijini', 'Vunjo', 'Rungwe', 'Vwawa'
         ];
 
+        // Create sample villages for each constituency
         foreach ($constituenciesWithWards as $constituencyName) {
             $constituency = districts::where('name', $constituencyName)->first();
 
