@@ -40,7 +40,7 @@ class AuthenticationController extends Controller
                 'position_id' => 'required|exists:positions,id',
                 'region_id' => 'required|exists:regions,id',
                 'village_id' => 'required',
-                'ward_id' => 'exists:wards',
+                'ward_id' => 'exists:wards,id',
                 'district_id' => 'required|exists:districts,id',
                 'other_candidate_details' => 'nullable|string',
                 'password' => 'required|min:6'
