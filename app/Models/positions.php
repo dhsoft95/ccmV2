@@ -13,6 +13,6 @@ class positions extends Model
 
     public function candidates()
     {
-        return $this->hasMany(candidates::class);
+        return $this->hasMany(candidate::class);
     }
 }

@@ -18,7 +18,7 @@ class districts extends Model
 
     public function candidates()
     {
-        return $this->belongsTo(candidates::class);
+        return $this->belongsTo(candidate::class);
     }
 
     public function location()

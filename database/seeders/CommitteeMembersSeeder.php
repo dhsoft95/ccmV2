@@ -8,7 +8,7 @@ use App\Models\districts;
 use App\Models\ward;
 use App\Models\village;
 use App\Models\Supporters;
-use App\Models\candidates;
+use App\Models\candidate;
 use App\Models\positions;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
@@ -55,7 +55,7 @@ class CommitteeMembersSeeder extends Seeder
         ]);
 
         // Create the candidate Haroun Rashid Maarifa
-        $candidate = candidates::create([
+        $candidate = candidate::create([
             'full_name' => 'Haroun Rashid Maarifa',
             'name' => 'Haroun Rashid Maarifa',
             'email' => 'mrmaarifa@gmail.com',

@@ -12,7 +12,7 @@ class messages extends Model
 
     public function candidate()
     {
-        return $this->belongsTo(candidates::class);
+        return $this->belongsTo(candidate::class);
     }
 
     public function area()

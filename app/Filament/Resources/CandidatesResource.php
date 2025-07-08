@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CandidatesResource\Pages;
 use App\Filament\Resources\CandidatesResource\RelationManagers;
-use App\Models\candidates;
+use App\Models\candidate;
 use App\Models\districts;
 use App\Models\User;
 use App\Models\village;
@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Hash;
 
 class CandidatesResource extends Resource
 {
-    protected static ?string $model = candidates::class;
+    protected static ?string $model = candidate::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-bookmark-square';
 

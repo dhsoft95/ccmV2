@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\candidates;
+use App\Models\Candidate; // Fixed model name to singular
 use App\Models\Otp;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -39,16 +39,25 @@ class AuthenticationController extends Controller
                 'party_affiliation' => 'required|string',
                 'position_id' => 'required|exists:positions,id',
                 'region_id' => 'required|exists:regions,id',
-                'village_id' => 'required',
-                'ward_id' => 'exists:wards,id',
+                'village_id' => 'required|string', // Changed to string
+                'ward_id' => 'required|string', // Changed from exists:wards,id to string
                 'district_id' => 'required|exists:districts,id',
                 'other_candidate_details' => 'nullable|string',
                 'password' => 'required|min:6'
+            ], [
+                // Custom error messages
+                'email.email' => 'Please enter a valid email address (e.g., user@example.com)',
+                'email.unique' => 'This email address is already registered',
+                'phone.unique' => 'This phone number is already registered',
+                'ward_id.required' => 'Ward is required',
+                'village_id.required' => 'Village is required',
             ]);
 
             Log::info('Registration validation passed', [
                 'email' => $validatedData['email'],
-                'phone' => $validatedData['phone']
+                'phone' => $validatedData['phone'],
+                'ward_id' => $validatedData['ward_id'],
+                'village_id' => $validatedData['village_id']
             ]);
 
         } catch (ValidationException $e) {
@@ -82,10 +91,11 @@ class AuthenticationController extends Controller
             Log::info('Attempting to create candidate record', [
                 'email' => $validatedData['email'],
                 'phone' => $validatedData['phone'],
-                'position_id' => $validatedData['position_id']
+                'position_id' => $validatedData['position_id'],
+                'ward_id' => $validatedData['ward_id']
             ]);
 
-            $user = Candidates::create([
+            $user = Candidate::create([
                 'full_name' => $validatedData['full_name'],
                 'email' => $validatedData['email'],
                 'password' => Hash::make($validatedData['password']),
@@ -94,15 +104,17 @@ class AuthenticationController extends Controller
                 'position_id' => $validatedData['position_id'],
                 'region_id' => $validatedData['region_id'],
                 'village_id' => $validatedData['village_id'],
-                'ward_id' => $validatedData['ward_id'],
+                'ward_id' => $validatedData['ward_id'], // Now stores as varchar
                 'district_id' => $validatedData['district_id'],
                 'other_candidate_details' => $validatedData['other_candidate_details']
             ]);
+
             // Log successful candidate creation
             Log::info('Candidate record created successfully', [
                 'candidate_id' => $user->id,
                 'email' => $user->email,
-                'phone' => $user->phone
+                'phone' => $user->phone,
+                'ward_id' => $user->ward_id
             ]);
 
         } catch (\Illuminate\Database\QueryException $e) {
@@ -160,6 +172,7 @@ class AuthenticationController extends Controller
                 'email' => $user->email,
                 'phone' => $user->phone,
                 'position_id' => $user->position_id,
+                'ward_id' => $user->ward_id,
                 'token_created' => true
             ]);
 
@@ -172,6 +185,8 @@ class AuthenticationController extends Controller
                         'email' => $user->email,
                         'position_id' => $user->position_id,
                         'phone' => $user->phone,
+                        'ward_id' => $user->ward_id,
+                        'village_id' => $user->village_id,
                     ],
                     'token' => $token
                 ]
@@ -201,7 +216,7 @@ class AuthenticationController extends Controller
             'password' => 'required|string',
         ]);
 
-        $candidate = Candidates::where('email', $request->input('email'))->first();
+        $candidate = Candidate::where('email', $request->input('email'))->first();
 
         if (!$candidate || !Hash::check($request->input('password'), $candidate->password)) {
             return response()->json([
@@ -225,6 +240,8 @@ class AuthenticationController extends Controller
                     'email' => $candidate->email,
                     'position_name' => $positionName,
                     'phone' => $candidate->phone,
+                    'ward_id' => $candidate->ward_id,
+                    'village_id' => $candidate->village_id,
                 ],
                 'token' => $token
             ]
@@ -238,7 +255,6 @@ class AuthenticationController extends Controller
             'message' => 'Logged out successfully'
         ]);
     }
-
 
     private function formatPhoneNumber($phone): array|string|null
     {
@@ -377,6 +393,7 @@ class AuthenticationController extends Controller
             ], 500);
         }
     }
+
     public function update(Request $request): \Illuminate\Http\JsonResponse
     {
         // Check if the user is authenticated
@@ -391,19 +408,19 @@ class AuthenticationController extends Controller
         $validatedData = $request->validate([
             'full_name' => 'string',
             'phone' => 'string|unique:candidates,phone,' . $id,
-            'email' => '|email|unique:candidates,email,' . $id,
+            'email' => 'email|unique:candidates,email,' . $id, // Fixed missing 'required' removed
             'party_affiliation' => 'string',
             'position_id' => 'exists:positions,id',
             'region_id' => 'exists:regions,id',
-            'village_id' => 'exists:villages,id',
-            'ward_id' => 'exists:wards,id',
+            'village_id' => 'string', // Changed to string
+            'ward_id' => 'string', // Changed to string
             'district_id' => 'exists:districts,id',
             'other_candidate_details' => 'nullable|string',
             'password' => 'nullable|min:6'
         ]);
 
         // Find the candidate by ID
-        $candidate = Candidates::find($id);
+        $candidate = Candidate::find($id);
 
         // Check if the candidate exists
         if (!$candidate) {
@@ -440,9 +457,10 @@ class AuthenticationController extends Controller
                     'email' => $candidate->email,
                     'phone' => $candidate->phone,
                     'position_name' => $positionName,
+                    'ward_id' => $candidate->ward_id,
+                    'village_id' => $candidate->village_id,
                 ],
             ]
         ]);
     }
-
 }

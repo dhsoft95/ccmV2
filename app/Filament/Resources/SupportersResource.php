@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SupportersResource\Pages;
 use App\Filament\Resources\SupportersResource\RelationManagers;
-use App\Models\candidates;
+use App\Models\candidate;
 use App\Models\districts;
 use App\Models\Supporters;
 use App\Models\village;
@@ -62,7 +62,7 @@ class SupportersResource extends Resource
                     ->searchable(),
                 Select::make('candidate_id')
                     ->label('Candidate')
-                    ->options(candidates::all()->pluck('full_name', 'id'))
+                    ->options(candidate::all()->pluck('full_name', 'id'))
                     ->searchable(),
                 Forms\Components\TextInput::make('phone_number')
                     ->tel()

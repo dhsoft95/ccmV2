@@ -24,7 +24,7 @@ class sms_logs extends Model
 
     public function candidate()
     {
-        return $this->belongsTo(candidates::class, 'candidate_id');
+        return $this->belongsTo(candidate::class, 'candidate_id');
     }
 }
 
