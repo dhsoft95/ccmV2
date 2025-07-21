@@ -8,7 +8,7 @@ use App\Models\districts;
 use App\Models\ward;
 use App\Models\village;
 use App\Models\Supporters;
-use App\Models\candidate;
+use App\Models\Candidate;
 use App\Models\positions;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;

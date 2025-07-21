@@ -33,6 +33,7 @@ class AuthenticationController extends Controller
 
         try {
             $validatedData = $request->validate([
+                'name' => 'required|string',
                 'full_name' => 'required|string',
                 'phone' => 'required|string|unique:candidates,phone',
                 'email' => 'required|email|unique:candidates,email',
@@ -46,6 +47,7 @@ class AuthenticationController extends Controller
                 'password' => 'required|min:6'
             ], [
                 // Custom error messages
+                'name.required' => 'Name is required',
                 'email.email' => 'Please enter a valid email address (e.g., user@example.com)',
                 'email.unique' => 'This email address is already registered',
                 'phone.unique' => 'This phone number is already registered',
@@ -96,6 +98,7 @@ class AuthenticationController extends Controller
             ]);
 
             $user = Candidate::create([
+                'name' => $validatedData['name'],
                 'full_name' => $validatedData['full_name'],
                 'email' => $validatedData['email'],
                 'password' => Hash::make($validatedData['password']),
@@ -181,6 +184,7 @@ class AuthenticationController extends Controller
                 'message' => 'Registered successfully.',
                 'data' => [
                     'user' => [
+                        'name' => $user->name,
                         'full_name' => $user->full_name,
                         'email' => $user->email,
                         'position_id' => $user->position_id,
@@ -236,6 +240,7 @@ class AuthenticationController extends Controller
             'message' => 'Logged in successfully.',
             'data' => [
                 'user' => [
+                    'name' => $candidate->name,
                     'full_name' => $candidate->full_name,
                     'email' => $candidate->email,
                     'position_name' => $positionName,
@@ -406,6 +411,7 @@ class AuthenticationController extends Controller
 
         // Validate incoming request data
         $validatedData = $request->validate([
+            'name' => 'string',
             'full_name' => 'string',
             'phone' => 'string|unique:candidates,phone,' . $id,
             'email' => 'email|unique:candidates,email,' . $id, // Fixed missing 'required' removed
@@ -429,6 +435,7 @@ class AuthenticationController extends Controller
 
         // Update candidate data
         $candidate->update([
+            'name' => $validatedData['name'] ?? $candidate->name,
             'full_name' => $validatedData['full_name'] ?? $candidate->full_name,
             'email' => $validatedData['email'] ?? $candidate->email,
             'phone' => $validatedData['phone'] ?? $candidate->phone,
@@ -453,6 +460,7 @@ class AuthenticationController extends Controller
             'message' => 'Candidate updated successfully.',
             'data' => [
                 'user' => [
+                    'name' => $candidate->name,
                     'full_name' => $candidate->full_name,
                     'email' => $candidate->email,
                     'phone' => $candidate->phone,

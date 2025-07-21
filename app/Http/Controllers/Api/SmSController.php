@@ -21,27 +21,21 @@ class SmSController extends Controller
         $validator = Validator::make($request->all(), [
             'sms_content' => 'required|string|max:160',
         ]);
-
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
-
         try {
             $candidateId = Auth::id(); // Get candidate ID
-
             $smsContent = $request->input('sms_content');
-
             // Retrieve phone numbers of supporters associated with the candidate
             $supporterPhoneNumbers = Supporters::where('candidate_id', $candidateId)
                 ->pluck('phone_number');
-
             if ($supporterPhoneNumbers->isEmpty()) {
                 return response()->json([
                     'error' => true,
                     'message' => 'Failed to send SMS invitations: No supporters found',
                 ], 422);
             }
-
             foreach ($supporterPhoneNumbers as $phoneNumber) {
                 // Dispatch the job to send SMS asynchronously
                 SendSMSJob::dispatch($phoneNumber, $smsContent, $candidateId);
