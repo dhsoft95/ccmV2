@@ -1,16 +1,20 @@
 <?php
 
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schedule;
+use Illuminate\Support\Facades\Log;
 
-// Keep Horizon running
-Schedule::command('horizon')->everyMinute()->withoutOverlapping();
-
-// Your other scheduled tasks
+// Clean up old SMS logs weekly
 Schedule::call(function () {
-    Log::info('Daily SMS report task executed');
-})->daily();
-
-Schedule::call(function () {
-    \App\Models\sms_logs::where('created_at', '<', now()->subDays(30))->delete();
+    $deleted = \App\Models\sms_logs::where('created_at', '<', now()->subDays(30))->delete();
+    Log::info("Cleaned up {$deleted} old SMS logs");
 })->weekly();
+
+// Daily SMS report
+Schedule::call(function () {
+    $todayCount = \App\Models\sms_logs::whereDate('created_at', today())->count();
+    $successCount = \App\Models\sms_logs::whereDate('created_at', today())->where('status', 1)->count();
+    Log::info("Daily SMS Report: {$successCount}/{$todayCount} sent successfully");
+})->dailyAt('18:00');
+
+// Optional: Restart queue workers every few hours to prevent memory issues
+Schedule::command('queue:restart')->everySixHours();
