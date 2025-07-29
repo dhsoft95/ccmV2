@@ -19,7 +19,7 @@ class Supporters extends Model
 
     public function candidate(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(candidate::class);
+        return $this->belongsTo(Candidate::class);
     }
 
     public function region(): \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -36,7 +36,7 @@ class Supporters extends Model
     }
     public function candidates(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(candidate::class);
+        return $this->belongsTo(Candidate::class);
     }
     public function district(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {

@@ -62,7 +62,7 @@ class SupportersResource extends Resource
                     ->searchable(),
                 Select::make('candidate_id')
                     ->label('Candidate')
-                    ->options(candidate::all()->pluck('full_name', 'id'))
+                    ->options(Candidate::all()->pluck('full_name', 'id'))
                     ->searchable(),
                 Forms\Components\TextInput::make('phone_number')
                     ->tel()

@@ -17,7 +17,7 @@ class regions extends Model
 
     public function candidates()
     {
-        return $this->hasMany(candidate::class);
+        return $this->hasMany(Candidate::class);
     }
 
     public function districts()

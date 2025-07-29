@@ -55,7 +55,7 @@ class CommitteeMembersSeeder extends Seeder
         ]);
 
         // Create the candidate Haroun Rashid Maarifa
-        $candidate = candidate::create([
+        $candidate = Candidate::create([
             'full_name' => 'Haroun Rashid Maarifa',
             'name' => 'Haroun Rashid Maarifa',
             'email' => 'mrmaarifa@gmail.com',

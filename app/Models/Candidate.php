@@ -9,7 +9,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
-class candidate extends Authenticatable
+class Candidate extends Authenticatable
 {
     use HasFactory, Notifiable, HasApiTokens;
 
