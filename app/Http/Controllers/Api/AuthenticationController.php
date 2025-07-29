@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Candidate; // Fixed model name to singular
+use App\Models\Candidate;
 use App\Models\Otp;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -33,21 +33,21 @@ class AuthenticationController extends Controller
 
         try {
             $validatedData = $request->validate([
-                'name' => 'string',
-                'full_name' => 'required|string',
-                'phone' => 'required|string|unique:candidates,phone',
-                'email' => 'required|email|unique:candidates,email',
-                'party_affiliation' => 'required|string',
+                // 'name' => 'required|string|max:255', // Made required and added max length
+                'full_name' => 'required|string|max:255',
+                'phone' => 'required|string|unique:candidates,phone|max:20',
+                'email' => 'required|email|unique:candidates,email|max:255',
+                'party_affiliation' => 'required|string|max:255',
                 'position_id' => 'required|exists:positions,id',
                 'region_id' => 'required|exists:regions,id',
-                'village_id' => 'required|string', // Changed to string
-                'ward_id' => 'required|string', // Changed from exists:wards,id to string
+                'village_id' => 'required|string|max:255',
+                'ward_id' => 'required|string|max:255',
                 'district_id' => 'required|exists:districts,id',
                 'other_candidate_details' => 'nullable|string',
-                'password' => 'required|min:6'
+                'password' => 'required|min:6|max:255'
             ], [
                 // Custom error messages
-                'name.required' => 'Name is required',
+                // 'name.required' => 'Name is required',
                 'email.email' => 'Please enter a valid email address (e.g., user@example.com)',
                 'email.unique' => 'This email address is already registered',
                 'phone.unique' => 'This phone number is already registered',
@@ -68,7 +68,7 @@ class AuthenticationController extends Controller
                 'email' => $request->input('email'),
                 'phone' => $request->input('phone'),
                 'ip' => $request->ip(),
-                'input_data' => $request->except(['password']) // Log input without password
+                'input_data' => $request->except(['password'])
             ]);
 
             return response()->json(['errors' => $e->errors()], 422);
@@ -88,6 +88,9 @@ class AuthenticationController extends Controller
             ], 500);
         }
 
+        // Use database transaction for data integrity
+        DB::beginTransaction();
+
         try {
             // Log before attempting to create candidate
             Log::info('Attempting to create candidate record', [
@@ -97,20 +100,26 @@ class AuthenticationController extends Controller
                 'ward_id' => $validatedData['ward_id']
             ]);
 
+            // Ensure the Candidate model has proper fillable fields
             $user = Candidate::create([
-                'name' => $validatedData['name'],
+                // 'name' => $validatedData['name'],
                 'full_name' => $validatedData['full_name'],
                 'email' => $validatedData['email'],
                 'password' => Hash::make($validatedData['password']),
                 'phone' => $validatedData['phone'],
                 'party_affiliation' => $validatedData['party_affiliation'],
-                'position_id' => $validatedData['position_id'],
-                'region_id' => $validatedData['region_id'],
+                'position_id' => (int) $validatedData['position_id'], // Ensure integer
+                'region_id' => (int) $validatedData['region_id'], // Ensure integer
                 'village_id' => $validatedData['village_id'],
-                'ward_id' => $validatedData['ward_id'], // Now stores as varchar
-                'district_id' => $validatedData['district_id'],
-                'other_candidate_details' => $validatedData['other_candidate_details']
+                'ward_id' => $validatedData['ward_id'],
+                'district_id' => (int) $validatedData['district_id'], // Ensure integer
+                'other_candidate_details' => $validatedData['other_candidate_details'] ?? null
             ]);
+
+            // Verify the user was created
+            if (!$user || !$user->id) {
+                throw new \Exception('Failed to create candidate record');
+            }
 
             // Log successful candidate creation
             Log::info('Candidate record created successfully', [
@@ -120,7 +129,51 @@ class AuthenticationController extends Controller
                 'ward_id' => $user->ward_id
             ]);
 
+            // Create access token
+            Log::info('Attempting to create access token', [
+                'candidate_id' => $user->id,
+                'email' => $user->email
+            ]);
+
+            $token = $user->createToken('auth_token')->accessToken;
+
+            if (!$token) {
+                throw new \Exception('Failed to create access token');
+            }
+
+            // Commit the transaction
+            DB::commit();
+
+            Log::info('Registration completed successfully', [
+                'candidate_id' => $user->id,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'position_id' => $user->position_id,
+                'ward_id' => $user->ward_id,
+                'token_created' => true
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Registered successfully.',
+                'data' => [
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'full_name' => $user->full_name,
+                        'email' => $user->email,
+                        'position_id' => $user->position_id,
+                        'phone' => $user->phone,
+                        'ward_id' => $user->ward_id,
+                        'village_id' => $user->village_id,
+                    ],
+                    'token' => $token
+                ]
+            ]);
+
         } catch (\Illuminate\Database\QueryException $e) {
+            DB::rollBack();
+
             Log::error('Database error during candidate creation', [
                 'error_code' => $e->getCode(),
                 'error_message' => $e->getMessage(),
@@ -146,7 +199,9 @@ class AuthenticationController extends Controller
             ], 500);
 
         } catch (\Exception $e) {
-            Log::error('Unexpected error during candidate creation', [
+            DB::rollBack();
+
+            Log::error('Unexpected error during registration', [
                 'error' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
@@ -157,58 +212,7 @@ class AuthenticationController extends Controller
 
             return response()->json([
                 'error' => 'Registration failed',
-                'message' => 'An unexpected error occurred'
-            ], 500);
-        }
-
-        try {
-            // Log before token creation
-            Log::info('Attempting to create access token', [
-                'candidate_id' => $user->id,
-                'email' => $user->email
-            ]);
-
-            $token = $user->createToken('auth_token')->accessToken;
-
-            Log::info('Registration completed successfully', [
-                'candidate_id' => $user->id,
-                'email' => $user->email,
-                'phone' => $user->phone,
-                'position_id' => $user->position_id,
-                'ward_id' => $user->ward_id,
-                'token_created' => true
-            ]);
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Registered successfully.',
-                'data' => [
-                    'user' => [
-                        'name' => $user->name,
-                        'full_name' => $user->full_name,
-                        'email' => $user->email,
-                        'position_id' => $user->position_id,
-                        'phone' => $user->phone,
-                        'ward_id' => $user->ward_id,
-                        'village_id' => $user->village_id,
-                    ],
-                    'token' => $token
-                ]
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('Token creation failed during registration', [
-                'candidate_id' => $user->id ?? 'N/A',
-                'email' => $user->email ?? 'N/A',
-                'error' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return response()->json([
-                'error' => 'Registration completed but token creation failed',
-                'message' => 'Please try logging in manually'
+                'message' => 'An unexpected error occurred: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -411,18 +415,18 @@ class AuthenticationController extends Controller
 
         // Validate incoming request data
         $validatedData = $request->validate([
-            'name' => 'string',
-            'full_name' => 'string',
-            'phone' => 'string|unique:candidates,phone,' . $id,
-            'email' => 'email|unique:candidates,email,' . $id, // Fixed missing 'required' removed
-            'party_affiliation' => 'string',
+            'name' => 'string|max:255',
+            'full_name' => 'string|max:255',
+            'phone' => 'string|unique:candidates,phone,' . $id . '|max:20',
+            'email' => 'email|unique:candidates,email,' . $id . '|max:255',
+            'party_affiliation' => 'string|max:255',
             'position_id' => 'exists:positions,id',
             'region_id' => 'exists:regions,id',
-            'village_id' => 'string', // Changed to string
-            'ward_id' => 'string', // Changed to string
+            'village_id' => 'string|max:255',
+            'ward_id' => 'string|max:255',
             'district_id' => 'exists:districts,id',
             'other_candidate_details' => 'nullable|string',
-            'password' => 'nullable|min:6'
+            'password' => 'nullable|min:6|max:255'
         ]);
 
         // Find the candidate by ID
@@ -433,24 +437,20 @@ class AuthenticationController extends Controller
             return response()->json(['message' => 'Candidate not found.'], 404);
         }
 
-        // Update candidate data
-        $candidate->update([
-            'name' => $validatedData['name'] ?? $candidate->name,
-            'full_name' => $validatedData['full_name'] ?? $candidate->full_name,
-            'email' => $validatedData['email'] ?? $candidate->email,
-            'phone' => $validatedData['phone'] ?? $candidate->phone,
-            'party_affiliation' => $validatedData['party_affiliation'] ?? $candidate->party_affiliation,
-            'position_id' => $validatedData['position_id'] ?? $candidate->position_id,
-            'region_id' => $validatedData['region_id'] ?? $candidate->region_id,
-            'village_id' => $validatedData['village_id'] ?? $candidate->village_id,
-            'ward_id' => $validatedData['ward_id'] ?? $candidate->ward_id,
-            'district_id' => $validatedData['district_id'] ?? $candidate->district_id,
-            'other_candidate_details' => $validatedData['other_candidate_details'] ?? $candidate->other_candidate_details,
-            'password' => isset($validatedData['password']) ? Hash::make($validatedData['password']) : $candidate->password,
-        ]);
+        // Prepare update data
+        $updateData = [];
+        foreach ($validatedData as $key => $value) {
+            if ($key === 'password' && $value) {
+                $updateData[$key] = Hash::make($value);
+            } elseif ($key === 'position_id' || $key === 'region_id' || $key === 'district_id') {
+                $updateData[$key] = (int) $value;
+            } else {
+                $updateData[$key] = $value;
+            }
+        }
 
-        // Generate a new access token for the updated candidate
-        $token = $candidate->createToken('auth_token')->accessToken;
+        // Update candidate data
+        $candidate->update($updateData);
 
         // Fetch position name from the database table
         $positionName = DB::table('positions')->where('id', $candidate->position_id)->value('name');
