@@ -33,7 +33,7 @@ class AuthenticationController extends Controller
 
         try {
             $validatedData = $request->validate([
-                'name' => 'required|string',
+                'name' => 'string',
                 'full_name' => 'required|string',
                 'phone' => 'required|string|unique:candidates,phone',
                 'email' => 'required|email|unique:candidates,email',

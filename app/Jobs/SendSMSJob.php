@@ -74,6 +74,7 @@ class SendSMSJob implements ShouldQueue
                 'message' => $this->smsContent,
             ]);
 
+
             if ($status !== 'success') {
                 // Log the failure
                 Log::error('Failed to send SMS to ' . $this->phoneNumber . ': ' . $responseMessage);
