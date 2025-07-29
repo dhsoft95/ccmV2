@@ -2,29 +2,25 @@
 
 namespace App\Console\Commands;
 
+use App\Models\sms_logs;
 use Illuminate\Console\Command;
 
 class DispatchSmsCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'app:dispatch-sms-command';
+    protected $signature = 'sms:daily-report';
+    protected $description = 'Send daily SMS usage report';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Command description';
-
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
-        //
+        $todayCount = sms_logs::whereDate('created_at', today())->count();
+        $successCount = sms_logs::whereDate('created_at', today())
+            ->where('status', 1)
+            ->count();
+
+        $this->info("SMS Report: {$successCount}/{$todayCount} sent successfully today");
+
+        // Send report via email, Slack, etc.
+
+        return Command::SUCCESS;
     }
 }

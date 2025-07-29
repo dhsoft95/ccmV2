@@ -1,8 +1,16 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schedule;
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote')->hourly();
+// Keep Horizon running
+Schedule::command('horizon')->everyMinute()->withoutOverlapping();
+
+// Your other scheduled tasks
+Schedule::call(function () {
+    Log::info('Daily SMS report task executed');
+})->daily();
+
+Schedule::call(function () {
+    \App\Models\sms_logs::where('created_at', '<', now()->subDays(30))->delete();
+})->weekly();
