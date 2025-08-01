@@ -2,87 +2,89 @@
 
 namespace App\Jobs;
 
-use App\Models\sms_logs;
-use App\Models\Supporters;
-use GuzzleHttp\Client as GuzzleClient;
+use App\Services\SmsService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class SendSMSJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $phoneNumber;
-    protected $smsContent;
-    protected $candidateId;
+    public $tries = 3; // Limit retry attempts
+    public $timeout = 60; // Job timeout
 
-    /**
-     * Create a new job instance.
-     *
-     * @param string $phoneNumber
-     * @param string $smsContent
-     * @param int $candidateId
-     * @return void
-     */
-    public function __construct($phoneNumber, $smsContent, $candidateId)
+    public function __construct(
+        protected string $phoneNumber,
+        protected string $smsContent,
+        protected int $candidateId
+    ) {}
+
+    public function handle(SmsService $smsService): void
     {
-        $this->phoneNumber = $phoneNumber;
-        $this->smsContent = $smsContent;
-        $this->candidateId = $candidateId;
+        try {
+            Log::info('Processing SMS job', [
+                'phone' => $this->phoneNumber,
+                'candidate_id' => $this->candidateId
+            ]);
+
+            $result = $smsService->sendSms(
+                $this->phoneNumber,
+                $this->smsContent,
+                $this->candidateId
+            );
+
+            $smsService->logSms(
+                $this->candidateId,
+                $this->phoneNumber,
+                $this->smsContent,
+                $result['success'],
+                $result['sender_id']
+            );
+
+            if (!$result['success']) {
+                Log::warning('SMS delivery failed', [
+                    'recipient' => $this->phoneNumber,
+                    'candidate_id' => $this->candidateId,
+                    'sender_id' => $result['sender_id'],
+                    'error' => $result['message'],
+                ]);
+            } else {
+                Log::info('SMS sent successfully', [
+                    'recipient' => $this->phoneNumber,
+                    'candidate_id' => $this->candidateId,
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            Log::error('SMS job failed with exception', [
+                'phone' => $this->phoneNumber,
+                'candidate_id' => $this->candidateId,
+                'error' => $e->getMessage(),
+                'attempts' => $this->attempts()
+            ]);
+
+            // Don't retry if it's a critical error
+            if ($this->attempts() >= $this->tries) {
+                Log::error('SMS job failed permanently', [
+                    'phone' => $this->phoneNumber,
+                    'candidate_id' => $this->candidateId
+                ]);
+            }
+
+            throw $e;
+        }
     }
 
-    /**
-     * Execute the job.
-     *
-     * @return void
-     */
-    public function handle()
+    public function failed(\Throwable $exception): void
     {
-        $client = new GuzzleClient();
-        $senderId = auth()->user()?->sender_id;
-
-        try {
-            // Send the SMS using Guzzle HTTP client
-            $response = $client->post(env('SMS_API_URL'), [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . env('SMS_API_TOKEN'),
-                    'Accept' => 'application/json',
-                ],
-                'json' => [
-                    'recipient' => $this->phoneNumber,
-//                    'sender_id' => env('SMS_SENDER_ID'),
-                    'sender_id' => $senderId,
-                    'message' => $this->smsContent,
-                ],
-            ]);
-
-            $responseData = json_decode($response->getBody()->getContents(), true);
-
-            $status = $responseData['status'] ?? 'error';
-            $responseMessage = $responseData['message'] ?? 'Unknown error';
-
-            $statusValue = $status === 'success' ? 1 : 0;
-
-            // Save the log
-            sms_logs::create([
-                'candidate_id' => $this->candidateId,
-                'recipient' => $this->phoneNumber,
-                'status' => $statusValue,
-                'message' => $this->smsContent,
-            ]);
-
-
-            if ($status !== 'success') {
-                // Log the failure
-                Log::error('Failed to send SMS to ' . $this->phoneNumber . ': ' . $responseMessage);
-            }
-        } catch (\Exception $e) {
-            Log::error('SMS sending failed to ' . $this->phoneNumber . ': ' . $e->getMessage());
-        }
+        Log::error('SMS job completely failed', [
+            'phone' => $this->phoneNumber,
+            'candidate_id' => $this->candidateId,
+            'error' => $exception->getMessage()
+        ]);
     }
 }
