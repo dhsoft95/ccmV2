@@ -20,6 +20,13 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Rupadana\ApiService\ApiServicePlugin;
 
+// Import your custom widgets
+use App\Filament\Widgets\SmsStatsOverview;
+use App\Filament\Widgets\SmsMessagesChart;
+use App\Filament\Widgets\RecentSmsMessages;
+use App\Filament\Widgets\SmsStatusDistribution;
+use App\Filament\Widgets\TopSmsSenders;
+
 class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
@@ -49,10 +56,15 @@ class AdminPanelProvider extends PanelProvider
             ->pages([
                 Pages\Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+//            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+//                Widgets\AccountWidget::class,
+                SmsStatsOverview::class,
+                RecentSmsMessages::class,          // Table second
+                SmsMessagesChart::class,           // Chart third
+                SmsStatusDistribution::class,
+//                TopSmsSenders::class,
+//                Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -65,7 +77,6 @@ class AdminPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
-
             ->authMiddleware([
                 Authenticate::class,
             ]);
