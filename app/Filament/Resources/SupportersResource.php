@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SupportersResource\Pages;
 use App\Filament\Resources\SupportersResource\RelationManagers;
+use App\Filament\Imports\SupportersImport;
 use App\Models\Candidate;
 use App\Models\districts;
 use App\Models\Supporters;
@@ -15,6 +16,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Actions\ImportAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -24,7 +26,6 @@ class SupportersResource extends Resource
 
     protected static ?string $navigationGroup = 'PEOPLE';
 
-
     protected static ?string $navigationIcon = 'heroicon-m-user-group';
 
     public static function form(Form $form): Form
@@ -32,13 +33,13 @@ class SupportersResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('first_name')
-                    ->maxLength(255)
-                    ->default(null),
+                    ->required()
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('last_name')
-                    ->maxLength(255)
-                    ->default(null),
+                    ->required()
+                    ->maxLength(255),
                 Forms\Components\DatePicker::make('dob'),
-                Select::make('gander')
+                Select::make('gender')
                     ->options([
                         'male' => 'Male',
                         'female' => 'Female',
@@ -50,12 +51,10 @@ class SupportersResource extends Resource
                     ->label('District')
                     ->options(districts::all()->pluck('name', 'id'))
                     ->searchable(),
-
                 Select::make('village_id')
                     ->label('Village')
                     ->options(village::all()->pluck('name', 'id'))
                     ->searchable(),
-
                 Select::make('ward_id')
                     ->label('Ward')
                     ->options(ward::all()->pluck('name', 'id'))
@@ -63,13 +62,14 @@ class SupportersResource extends Resource
                 Select::make('candidate_id')
                     ->label('Candidate')
                     ->options(Candidate::all()->pluck('full_name', 'id'))
+                    ->required()
                     ->searchable(),
                 Forms\Components\TextInput::make('phone_number')
                     ->tel()
-                    ->maxLength(255)
-                    ->default(null),
+                    ->required()
+                    ->maxLength(255),
                 Forms\Components\Toggle::make('promised')
-                    ->required(),
+                    ->default(false),
                 Forms\Components\Textarea::make('other_supporter_details')
                     ->columnSpanFull(),
             ]);
@@ -78,31 +78,34 @@ class SupportersResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->query(fn () => Supporters::with(['region', 'district', 'ward', 'village', 'candidate']))
             ->columns([
                 Tables\Columns\TextColumn::make('first_name')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('last_name')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('dob')
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('gander')
+                Tables\Columns\TextColumn::make('gender')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('region.name')
-                    ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('village.name')
-                    ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('ward.name')
-                    ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('district.name')
-                    ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('candidate.full_name')
-                    ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('phone_number')
                     ->searchable(),
                 Tables\Columns\IconColumn::make('promised')
@@ -117,7 +120,14 @@ class SupportersResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('candidate_id')
+                    ->label('Candidate')
+                    ->relationship('candidate', 'full_name'),
+                Tables\Filters\SelectFilter::make('region_id')
+                    ->label('Region')
+                    ->relationship('region', 'name'),
+                Tables\Filters\TernaryFilter::make('promised')
+                    ->label('Promised Support'),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -128,6 +138,12 @@ class SupportersResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ])
+            ->headerActions([
+                Tables\Actions\ImportAction::make()
+                    ->importer(SupportersImport::class)
+                    ->label('Import Supporters')
+                    ->color('success'),
             ]);
     }
 

@@ -37,6 +37,7 @@ class Candidate extends Authenticatable
         'name',
         'phone',
         'email',
+        'sender_id',
         'party_affiliation',
         'position_id',
         'region_id',

@@ -67,6 +67,9 @@ class CandidatesResource extends Resource
                     ->label('District')
                     ->options(districts::all()->pluck('name', 'id'))
                     ->searchable(),
+                Forms\Components\TextInput::make('sender_id')
+                    ->required()->label('Sender ID')
+                    ->maxLength(255),
                 Forms\Components\Textarea::make('other_candidate_details')
                     ->columnSpanFull(),
                 Forms\Components\DateTimePicker::make('email_verified_at'),
@@ -98,6 +101,9 @@ class CandidatesResource extends Resource
                 Tables\Columns\TextColumn::make('region.name')
                     ->numeric()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('sender_id')
+                    ->numeric()
+                    ->sortable()->label('Sender ID'),
                 Tables\Columns\TextColumn::make('village.name')
                     ->numeric()
                     ->sortable(),

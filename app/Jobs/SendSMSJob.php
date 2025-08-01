@@ -44,6 +44,7 @@ class SendSMSJob implements ShouldQueue
     public function handle()
     {
         $client = new GuzzleClient();
+        $senderId = auth()->user()?->sender_id;
 
         try {
             // Send the SMS using Guzzle HTTP client
@@ -54,7 +55,8 @@ class SendSMSJob implements ShouldQueue
                 ],
                 'json' => [
                     'recipient' => $this->phoneNumber,
-                    'sender_id' => env('SMS_SENDER_ID'),
+//                    'sender_id' => env('SMS_SENDER_ID'),
+                    'sender_id' => $senderId,
                     'message' => $this->smsContent,
                 ],
             ]);
