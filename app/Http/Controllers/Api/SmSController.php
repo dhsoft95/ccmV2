@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Jobs\SendSmsJob;
+use App\Jobs\SendSMSJob;
 use App\Models\Supporters;
 use App\Services\SmsService;
 use Illuminate\Http\Request;
@@ -40,7 +40,7 @@ class SmSController extends Controller
 
             foreach ($supporterPhoneNumbers as $phoneNumber) {
                 // Dispatch the job to send SMS asynchronously
-                SendSmsJob::dispatch($phoneNumber, $smsContent, $candidateId);
+                SendSMSJob::dispatch($phoneNumber, $smsContent, $candidateId);
             }
 
             return response()->json([
