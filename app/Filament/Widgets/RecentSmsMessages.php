@@ -82,8 +82,7 @@ class RecentSmsMessages extends BaseWidget
                 Tables\Actions\Action::make('view')
                     ->label('View')
                     ->icon('heroicon-m-eye')
-                    ->color('gray')
-                    ->url(fn ($record) => route('filament.admin.resources.sms-logs.view', ['record' => $record->id])),
+                    ->color('gray'),
 
                 Tables\Actions\Action::make('resend')
                     ->label('Resend')
