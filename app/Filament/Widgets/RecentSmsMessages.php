@@ -75,10 +75,15 @@ class RecentSmsMessages extends BaseWidget
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Sent')
                     ->since()
-                    ->dateTimeTooltip()
+                    ->tooltip(fn ($record) => $record->created_at->format('l, F j, Y \a\t g:i A'))
                     ->sortable(),
             ])
             ->actions([
+                Tables\Actions\Action::make('view')
+                    ->label('View')
+                    ->icon('heroicon-m-eye')
+                    ->color('gray')
+                    ->url(fn ($record) => route('filament.admin.resources.sms-logs.view', ['record' => $record->id])),
 
                 Tables\Actions\Action::make('resend')
                     ->label('Resend')
