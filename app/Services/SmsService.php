@@ -17,7 +17,10 @@ class SmsService
 
     public function __construct()
     {
-        $this->client = new GuzzleClient();
+        $this->client = new GuzzleClient([
+            'timeout' => 30,
+            'connect_timeout' => 10,
+        ]);
         $this->apiUrl = config('sms.api_url');
         $this->apiToken = config('sms.api_token');
         $this->defaultSenderId = config('sms.default_sender_id');
@@ -25,6 +28,16 @@ class SmsService
 
     public function sendSms(string $recipient, string $message, ?int $candidateId = null): array
     {
+        // Skip if empty phone number
+        if (empty($recipient)) {
+            return [
+                'success' => false,
+                'message' => 'Phone number is empty',
+                'sender_id' => $this->resolveSenderId($candidateId),
+                'data' => null,
+            ];
+        }
+
         $senderId = $this->resolveSenderId($candidateId);
 
         try {

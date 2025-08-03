@@ -29,22 +29,44 @@ class SmSController extends Controller
 
             // Retrieve phone numbers of supporters associated with the candidate
             $supporterPhoneNumbers = Supporters::where('candidate_id', $candidateId)
+                ->whereNotNull('phone_number')
+                ->where('phone_number', '!=', '')
                 ->pluck('phone_number');
 
             if ($supporterPhoneNumbers->isEmpty()) {
                 return response()->json([
                     'error' => true,
-                    'message' => 'Failed to send SMS invitations: No supporters found',
+                    'message' => 'Failed to send SMS invitations: No supporters with valid phone numbers found',
                 ], 422);
             }
 
+            $dispatched = 0;
+            $skipped = 0;
+
             foreach ($supporterPhoneNumbers as $phoneNumber) {
-                // Dispatch the job to send SMS asynchronously
-                SendSMSJob::dispatch($phoneNumber, $smsContent, $candidateId);
+                if (!empty($phoneNumber)) {
+                    // Dispatch the job to send SMS asynchronously
+                    SendSMSJob::dispatch($phoneNumber, $smsContent, $candidateId);
+                    $dispatched++;
+                } else {
+                    $skipped++;
+                }
             }
 
+            Log::info('SMS invitations processed', [
+                'candidate_id' => $candidateId,
+                'dispatched' => $dispatched,
+                'skipped' => $skipped,
+                'total_supporters' => $supporterPhoneNumbers->count()
+            ]);
+
             return response()->json([
-                'message' => 'SMS invitations queued for sending.',
+                'message' => "SMS invitations queued for sending to {$dispatched} supporters.",
+                'stats' => [
+                    'dispatched' => $dispatched,
+                    'skipped' => $skipped,
+                    'total' => $dispatched + $skipped
+                ]
             ]);
 
         } catch (\Exception $e) {
